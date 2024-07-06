@@ -17,10 +17,11 @@ import Level from "./level";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import MaxMarkTable from "./MaxMarksTable";
+import "./styles.css";
 const Main_table = ({ tableName }) => {
-  
+
   const containerRef = useRef(null);
-  const {data, setData} = UseData();
+  const { data, setData } = UseData();
   const [isShow, setIsShow] = useState(false);
   const [showbtn, setShowbtn] = useState(false);
   const { valuefortest1, setValuefortest1 } = UseData();
@@ -29,8 +30,9 @@ const Main_table = ({ tableName }) => {
   const { valueforyearlabel, setvalueforyearlabel } = UseData();
   const { valueforsubjectlabel, setvalueforsubjectlabel } = UseData();
   const { valueforsemlabel, setvalueforsemlabel } = UseData();
-  const {valuefordivisionlabel,setValuefordivisionlabel}=UseData();
+  const { valuefordivisionlabel, setValuefordivisionlabel } = UseData();
   const { resultState, setResultState } = UseData() || {};
+  const { valueForMaxMarks, setValueForMaxMarks } = UseData();
   const createTable = async () => {
     try {
       setShowbtn(true);
@@ -65,11 +67,17 @@ const Main_table = ({ tableName }) => {
                 row["UT3-Q1"] !== null && row["UT3-Q2"] !== null
                   ? row["UT3-Q1"] + row["UT3-Q2"]
                   : null;
+
+              const endsem =
+                row["INSEM-Q1"] !== null && row["INSEM-Q2"] !== null && row["UA"] !== null
+                  ? row["UA"] - row["INSEM-Q1"] - row["INSEM-Q2"]
+                  : null;
               return {
                 ...row,
                 ["Total-UT1"]: totalUT1,
                 ["Total-UT2"]: totalUT2,
                 ["Total-UT3"]: totalUT3,
+                ["ENDSEM"]: endsem,
               };
             });
 
@@ -102,11 +110,16 @@ const Main_table = ({ tableName }) => {
         row["UT3-Q1"] !== null && row["UT3-Q2"] !== null
           ? row["UT3-Q1"] + row["UT3-Q2"]
           : null;
+      const endsem =
+        row["INSEM-Q1"] !== null && row["INSEM-Q2"] !== null
+          ? row["UA"] - row["INSEM-Q1"] - row["INSEM-Q2"]
+          : null;
       return {
         ...row,
         ["Total-UT1"]: totalUT1,
         ["Total-UT2"]: totalUT2,
         ["Total-UT3"]: totalUT3,
+        ["ENDSEM"]: endsem,
       };
     });
 
@@ -115,15 +128,14 @@ const Main_table = ({ tableName }) => {
 
   const handleMarksChange = (index, question, value, e) => {
     const updatedData = [...data];
-
     if (value === null) {
       updatedData[index][question] = null;
     } else {
       const numericValue = isNaN(value) ? 0 : parseInt(value, 10);
-      if (numericValue > 15) {
-        e.target.value = 15;
+      if (numericValue > (valueForMaxMarks.CO_1 !== null ? valueForMaxMarks.CO_1 : 15)) {
+        e.target.value = (valueForMaxMarks.CO_1 !== null ? valueForMaxMarks.CO_1 : 15);
         updatedData[index] ??= {};
-        updatedData[index][question] = 15;
+        updatedData[index][question] = (valueForMaxMarks.CO_1 !== null ? valueForMaxMarks.CO_1 : 15);
       } else if (numericValue < 0) {
         e.target.value = 0;
         updatedData[index] ??= {};
@@ -167,6 +179,19 @@ const Main_table = ({ tableName }) => {
         (updatedData[index]["UT3-Q1"] || 0) +
         (updatedData[index]["UT3-Q2"] || 0);
     }
+    if (
+      updatedData[index]["INSEM-Q1"] === null ||
+      updatedData[index]["INSEM-Q2"] === null ||
+      updatedData[index]["UA"] === null
+
+    ) {
+      updatedData[index]["ENDSEM"] = null;
+    } else {
+      updatedData[index]["ENDSEM"] =
+        (updatedData[index]["UA"] || 0)
+        - (updatedData[index]["INSEM-Q1"] || 0) -
+        (updatedData[index]["INSEM-Q2"] || 0);
+    }
     setData(updatedData);
   };
 
@@ -186,6 +211,19 @@ const Main_table = ({ tableName }) => {
 
     updatedData[index] ??= {};
     updatedData[index][question] = numericValue;
+    if (
+      updatedData[index]["INSEM-Q1"] === null ||
+      updatedData[index]["INSEM-Q2"] === null ||
+      updatedData[index]["UA"] === null
+
+    ) {
+      updatedData[index]["ENDSEM"] = null;
+    } else {
+      updatedData[index]["ENDSEM"] =
+        (updatedData[index]["UA"] || 0)
+        - (updatedData[index]["INSEM-Q1"] || 0) -
+        (updatedData[index]["INSEM-Q2"] || 0);
+    }
     setData(updatedData);
   };
 
@@ -414,6 +452,9 @@ const Main_table = ({ tableName }) => {
       "UT2-Q2",
       "UT3-Q1",
       "UT3-Q2",
+      "INSEM-Q1",
+      "INSEM-Q2",
+      "ENDSEM",
       "UA",
       "Total-UT1",
       "Total-UT2",
@@ -434,6 +475,9 @@ const Main_table = ({ tableName }) => {
           row["UT2-Q2"] === null ? "A" : row["UT2-Q2"],
           row["UT3-Q1"] === null ? "A" : row["UT3-Q1"],
           row["UT3-Q2"] === null ? "A" : row["UT3-Q2"],
+          row["INSEM-Q1"] === null ? "A" : row["INSEM-Q1"],
+          row["INSEM-Q2"] === null ? "A" : row["INSEM-Q2"],
+          row["ENDSEM"] === 0 ? "FF" : row["ENDSEM"],
           row["UA"] === 0 ? "FF" : row["UA"],
           row["Total-UT1"] === null ? "A" : row["Total-UT1"],
           row["Total-UT2"] === null ? "A" : row["Total-UT2"],
@@ -532,34 +576,34 @@ const Main_table = ({ tableName }) => {
 
     // Get the below content from the UI
     const belowContentElement2 = document.getElementById('below-attainment');
-  if (belowContentElement2) {
-    // Convert the table HTML to a string
-    const tableHtml2 = belowContentElement2.innerHTML;
-    // Create a temporary element to parse the HTML table
-    const tempElement2 = document.createElement('div');
-    tempElement2.innerHTML = tableHtml2;
-    // Get the table element
-    const tableElement2 = tempElement2.querySelector('table');
-    // Parse the HTML table and extract the data
-    const tableData2 = [];
-    const rows2 = tableElement2.querySelectorAll('tr');
-    rows2.forEach((row, rowIndex) => {
-      const rowData2 = [];
-      const cells2 = row.querySelectorAll('td');
-      cells2.forEach((cell, cellIndex) => {
-        const text2 = cell.querySelector('input') ? cell.querySelector('input').value.trim() : cell.textContent.trim();
-        rowData2.push(text2);
+    if (belowContentElement2) {
+      // Convert the table HTML to a string
+      const tableHtml2 = belowContentElement2.innerHTML;
+      // Create a temporary element to parse the HTML table
+      const tempElement2 = document.createElement('div');
+      tempElement2.innerHTML = tableHtml2;
+      // Get the table element
+      const tableElement2 = tempElement2.querySelector('table');
+      // Parse the HTML table and extract the data
+      const tableData2 = [];
+      const rows2 = tableElement2.querySelectorAll('tr');
+      rows2.forEach((row, rowIndex) => {
+        const rowData2 = [];
+        const cells2 = row.querySelectorAll('td');
+        cells2.forEach((cell, cellIndex) => {
+          const text2 = cell.querySelector('input') ? cell.querySelector('input').value.trim() : cell.textContent.trim();
+          rowData2.push(text2);
+        });
+        tableData2.push(rowData2);
       });
-      tableData2.push(rowData2);
-    });
-    // Add the second table to the PDF
-    doc.autoTable({
-      body: tableData2,
-      startY: belowContentY + 450, // Adjust Y position as needed
-      theme: 'striped',
-      margin: { left: 300, right: 300 } // Adjust margins as needed
-    });
-  }
+      // Add the second table to the PDF
+      doc.autoTable({
+        body: tableData2,
+        startY: belowContentY + 450, // Adjust Y position as needed
+        theme: 'striped',
+        margin: { left: 300, right: 300 } // Adjust margins as needed
+      });
+    }
 
 
     const nameAndSign = "Examiners name & Sign:";
@@ -580,6 +624,16 @@ const Main_table = ({ tableName }) => {
 
     // Save the PDF
     doc.save("table.pdf");
+  };
+
+  const exceedsMaxMarks = (value, maxValue) => {
+    const numericValue = parseInt(value, 10) || 0;
+    return numericValue > (maxValue !== null ? maxValue : 15);
+  };
+
+  const exceedsMaxMarksUA = (value, maxValue) => {
+    const numericValue = parseInt(value, 10) || 0;
+    return numericValue > (maxValue !== null ? maxValue : 100);
   };
 
   return (
@@ -614,8 +668,8 @@ const Main_table = ({ tableName }) => {
               {(valuefortest1 === "UT-3" || valuefortest1 === "UA") && (
                 <th>CO-6</th>
               )}
-              {valuefortest1 === "UA" && <th>Ensem-CO1</th>}
-              {valuefortest1 === "UA" && <th>Ensem-CO2</th>}
+              {valuefortest1 === "UA" && <th>Insem-CO1</th>}
+              {valuefortest1 === "UA" && <th>Insem-CO2</th>}
               {valuefortest1 === "UA" && <th>Endesm</th>}
               {valuefortest1 === "UA" && <th>UA</th>}
               {(valuefortest1 === "UT-1" ||
@@ -642,146 +696,181 @@ const Main_table = ({ tableName }) => {
                     valuefortest1 === "UT-2" ||
                     valuefortest1 === "UT-3" ||
                     valuefortest1 === "UA") && (
-                    <td>
-                      <input
-                        type="text"
-                        className={`q1-input-${index}`}
-                        defaultValue={
-                          row["UT1-Q1"] === null ? "A" : row["UT1-Q1"]
-                        }
-                        onChange={(e) => {
-                          let value = e.target.value.trim();
-                          if (/^[0-9]*$/.test(value)) {
-                            // If input is a number, update normally
-                            setData({ ...data, ["UT1-Q1"]: value });
-                            handleMarksChange(
-                              index,
-                              "UT1-Q1",
-                              parseInt(e.target.value, 10) || 0,
-                              e
-                            );
-                          } else if (value === "a" || value === "A") {
-                            // If input is 'a' or 'A', update normally
-                            setData({ ...data, ["UT1-Q1"]: null });
-                            handleMarksChange(index, "UT1-Q1", null, e);
-                          } else {
-                            // Notify user about invalid input
-                            alert("Please enter only 'a' or a number.");
-                            e.preventDefault();
-                            return;
-                          }
-                        }}
-                      />
-                    </td>
-                  )}
+                      <td
+                        className={`q1-input-${index} ${exceedsMaxMarks(row["UT1-Q1"], valueForMaxMarks.CO_1) ? 'light-red-background' : ''}`}
+                      >
+                        <input
+                          key={index}
+                          className={`q2-input-${index}`}
+                          type="text"
+                          defaultValue={row["UT1-Q1"] === null ? "A" : row["UT1-Q1"]}
+                          onChange={(e) => {
+                            let value = e.target.value.trim();
+                            if (/^[0-9]*$/.test(value)) {
+
+                              setData({ ...data, ["UT1-Q1"]: value });
+                              handleMarksChange(index, "UT1-Q1", parseInt(e.target.value, 10) || 0, e);
+                              const numericValue = parseInt(value, 10) || 0;
+                              const exceedsMaxMarks = numericValue > (valueForMaxMarks.CO_1 !== null ? valueForMaxMarks.CO_1 : 15);
+                              if (exceedsMaxMarks) {
+                                toast.warn("Marks exceeded maximum marks.");
+                                e.currentTarget.classList.add('light-red-background'); // Apply class to td
+                              } else {
+                                e.currentTarget.classList.remove('light-red-background'); // Remove class from td
+                              }
+                            } else if (value === "a" || value === "A") {
+                              setData({ ...data, ["UT1-Q1"]: null });
+                              handleMarksChange(index, "UT1-Q1", null, e);
+                              e.currentTarget.classList.remove('light-red-background'); // Remove class from td
+                            } else {
+                              alert("Please enter only 'a' or a number.");
+                              e.preventDefault();
+                              return;
+                            }
+                          }}
+                        />
+                      </td>
+                    )}
                   {(valuefortest1 === "UT-1" ||
                     valuefortest1 === "UT-2" ||
                     valuefortest1 === "UT-3" ||
                     valuefortest1 === "UA") && (
-                    <td>
-                      <input
-                        type="text"
-                        className={`q2-input-${index}`}
-                        defaultValue={
-                          row["UT1-Q2"] === null ? "A" : row["UT1-Q2"]
-                        }
-                        onChange={(e) => {
-                          let value = e.target.value.trim();
-                          if (/^[0-9]*$/.test(value)) {
-                            // If input is a number, update normally
-                            setData({ ...data, ["UT1-Q2"]: value });
-                            handleMarksChange(
-                              index,
-                              "UT1-Q2",
-                              parseInt(e.target.value, 10) || 0,
-                              e
-                            );
-                          } else if (value === "a" || value === "A") {
-                            // If input is 'a' or 'A', update normally
-                            setData({ ...data, ["UT1-Q2"]: null });
-                            handleMarksChange(index, "UT1-Q2", null, e);
-                          } else {
-                            // Notify user about invalid input
-                            alert("Please enter only 'a' or a number.");
-                            e.preventDefault();
-                            return;
+                      <td
+                        className={`q1-input-${index} ${exceedsMaxMarks(row["UT1-Q2"], valueForMaxMarks.CO_1) ? 'light-red-background' : ''}`}
+                      >
+                        <input
+                          type="text"
+                          className={`q2-input-${index}`}
+                          defaultValue={
+                            row["UT1-Q2"] === null ? "A" : row["UT1-Q2"]
                           }
-                        }}
-                      />
-                    </td>
-                  )}
+                          onChange={(e) => {
+                            let value = e.target.value.trim();
+                            if (/^[0-9]*$/.test(value)) {
+                              // If input is a number, update normally
+                              setData({ ...data, ["UT1-Q2"]: value });
+                              handleMarksChange(
+                                index,
+                                "UT1-Q2",
+                                parseInt(e.target.value, 10) || 0,
+                                e
+                              );
+                              const numericValue = parseInt(value, 10) || 0;
+                              const exceedsMaxMarks = numericValue > (valueForMaxMarks.CO_1 !== null ? valueForMaxMarks.CO_1 : 15);
+                              if (exceedsMaxMarks) {
+                                toast.warn("Marks exceeded maximum marks.");
+                                e.target.classList.add('light-red-background');
+                              } else {
+                                e.target.classList.remove('light-red-background');
+                              }
+                            } else if (value === "a" || value === "A") {
+                              // If input is 'a' or 'A', update normally
+                              setData({ ...data, ["UT1-Q2"]: null });
+                              handleMarksChange(index, "UT1-Q2", null, e);
+                            } else {
+                              // Notify user about invalid input
+                              alert("Please enter only 'a' or a number.");
+                              e.preventDefault();
+                              return;
+                            }
+                          }}
+                        />
+                      </td>
+                    )}
                   {(valuefortest1 === "UT-2" ||
                     valuefortest1 === "UT-3" ||
                     valuefortest1 === "UA") && (
-                    <td>
-                      <input
-                        type="text"
-                        className={`q1-input-${index}`}
-                        defaultValue={
-                          row["UT2-Q1"] === null ? "A" : row["UT2-Q1"]
-                        }
-                        onChange={(e) => {
-                          let value = e.target.value.trim();
-                          if (/^[0-9]*$/.test(value)) {
-                            // If input is a number, update normally
-                            setData({ ...data, ["UT2-Q1"]: value });
-                            handleMarksChange(
-                              index,
-                              "UT2-Q1",
-                              parseInt(e.target.value, 10) || 0,
-                              e
-                            );
-                          } else if (value === "a" || value === "A") {
-                            // If input is 'a' or 'A', update normally
-                            setData({ ...data, ["UT2-Q1"]: null });
-                            handleMarksChange(index, "UT2-Q1", null, e);
-                          } else {
-                            // Notify user about invalid input
-                            alert("Please enter only 'a' or a number.");
-                            e.preventDefault();
-                            return;
+                      <td
+
+                        className={`q1-input-${index} ${exceedsMaxMarks(row["UT2-Q1"], valueForMaxMarks.CO_1) ? 'light-red-background' : ''}`}>
+                        <input
+                          type="text"
+                          className={`q1-input-${index}`}
+                          defaultValue={
+                            row["UT2-Q1"] === null ? "A" : row["UT2-Q1"]
                           }
-                        }}
-                      />
-                    </td>
-                  )}
+                          onChange={(e) => {
+                            let value = e.target.value.trim();
+                            if (/^[0-9]*$/.test(value)) {
+                              // If input is a number, update normally
+                              setData({ ...data, ["UT2-Q1"]: value });
+                              handleMarksChange(
+                                index,
+                                "UT2-Q1",
+                                parseInt(e.target.value, 10) || 0,
+                                e
+                              );
+                              const numericValue = parseInt(value, 10) || 0;
+                              const exceedsMaxMarks = numericValue > (valueForMaxMarks.CO_1 !== null ? valueForMaxMarks.CO_1 : 15);
+                              if (exceedsMaxMarks) {
+                                toast.warn("Marks exceeded maximum marks.");
+                                e.target.classList.add('light-red-background');
+                              } else {
+                                e.target.classList.remove('light-red-background');
+                              }
+                            } else if (value === "a" || value === "A") {
+                              // If input is 'a' or 'A', update normally
+                              setData({ ...data, ["UT2-Q1"]: null });
+                              handleMarksChange(index, "UT2-Q1", null, e);
+                            } else {
+                              // Notify user about invalid input
+                              alert("Please enter only 'a' or a number.");
+                              e.preventDefault();
+                              return;
+                            }
+                          }}
+                        />
+                      </td>
+                    )}
                   {(valuefortest1 === "UT-2" ||
                     valuefortest1 === "UT-3" ||
                     valuefortest1 === "UA") && (
-                    <td>
-                      <input
-                        type="text"
-                        className={`q2-input-${index}`}
-                        defaultValue={
-                          row["UT2-Q2"] === null ? "A" : row["UT2-Q2"]
-                        }
-                        onChange={(e) => {
-                          let value = e.target.value.trim();
-                          if (/^[0-9]*$/.test(value)) {
-                            // If input is a number, update normally
-                            setData({ ...data, ["UT2-Q2"]: value });
-                            handleMarksChange(
-                              index,
-                              "UT2-Q2",
-                              parseInt(e.target.value, 10) || 0,
-                              e
-                            );
-                          } else if (value === "a" || value === "A") {
-                            // If input is 'a' or 'A', update normally
-                            setData({ ...data, ["UT2-Q2"]: null });
-                            handleMarksChange(index, "UT2-Q2", null, e);
-                          } else {
-                            // Notify user about invalid input
-                            alert("Please enter only 'a' or a number.");
-                            e.preventDefault();
-                            return;
+                      <td
+                        className={`q1-input-${index} ${exceedsMaxMarks(row["UT2-Q2"], valueForMaxMarks.CO_1) ? 'light-red-background' : ''}`}
+                      >
+                        <input
+                          type="text"
+                          className={`q2-input-${index}`}
+                          defaultValue={
+                            row["UT2-Q2"] === null ? "A" : row["UT2-Q2"]
                           }
-                        }}
-                      />
-                    </td>
-                  )}
+                          onChange={(e) => {
+                            let value = e.target.value.trim();
+                            if (/^[0-9]*$/.test(value)) {
+                              // If input is a number, update normally
+                              setData({ ...data, ["UT2-Q2"]: value });
+                              handleMarksChange(
+                                index,
+                                "UT2-Q2",
+                                parseInt(e.target.value, 10) || 0,
+                                e
+                              );
+                              const numericValue = parseInt(value, 10) || 0;
+                              const exceedsMaxMarks = numericValue > (valueForMaxMarks.CO_1 !== null ? valueForMaxMarks.CO_1 : 15);
+                              if (exceedsMaxMarks) {
+                                toast.warn("Marks exceeded maximum marks.");
+                                e.target.classList.add('light-red-background');
+                              } else {
+                                e.target.classList.remove('light-red-background');
+                              }
+                            } else if (value === "a" || value === "A") {
+                              // If input is 'a' or 'A', update normally
+                              setData({ ...data, ["UT2-Q2"]: null });
+                              handleMarksChange(index, "UT2-Q2", null, e);
+                            } else {
+                              // Notify user about invalid input
+                              alert("Please enter only 'a' or a number.");
+                              e.preventDefault();
+                              return;
+                            }
+                          }}
+                        />
+                      </td>
+                    )}
                   {(valuefortest1 === "UT-3" || valuefortest1 === "UA") && (
-                    <td>
+                    <td
+                      className={`q1-input-${index} ${exceedsMaxMarks(row["UT3-Q1"], valueForMaxMarks.CO_1) ? 'light-red-background' : ''}`}
+                    >
                       <input
                         type="text"
                         className={`q1-input-${index}`}
@@ -799,6 +888,13 @@ const Main_table = ({ tableName }) => {
                               parseInt(e.target.value, 10) || 0,
                               e
                             );
+
+                            if (exceedsMaxMarks(row["UT3-Q1"], valueForMaxMarks.CO_1)) {
+                              toast.warn("Marks exceeded maximum marks.");
+                              e.target.classList.add('light-red-background');
+                            } else {
+                              e.target.classList.remove('light-red-background');
+                            }
                           } else if (value === "a" || value === "A") {
                             // If input is 'a' or 'A', update normally
                             setData({ ...data, ["UT3-Q1"]: null });
@@ -814,7 +910,9 @@ const Main_table = ({ tableName }) => {
                     </td>
                   )}
                   {(valuefortest1 === "UT-3" || valuefortest1 === "UA") && (
-                    <td>
+                    <td
+                      className={`q1-input-${index} ${exceedsMaxMarks(row["UT3-Q2"], valueForMaxMarks.CO_1) ? 'light-red-background' : ''}`}
+                    >
                       <input
                         type="text"
                         className={`q2-input-${index}`}
@@ -832,6 +930,13 @@ const Main_table = ({ tableName }) => {
                               parseInt(e.target.value, 10) || 0,
                               e
                             );
+
+                            if (exceedsMaxMarks(row["UT3-Q2"], valueForMaxMarks.CO_1)) {
+                              toast.warn("Marks exceeded maximum marks.");
+                              e.target.classList.add('light-red-background');
+                            } else {
+                              e.target.classList.remove('light-red-background');
+                            }
                           } else if (value === "a" || value === "A") {
                             // If input is 'a' or 'A', update normally
                             setData({ ...data, ["UT3-Q2"]: null });
@@ -846,12 +951,106 @@ const Main_table = ({ tableName }) => {
                       />
                     </td>
                   )}
-                  {valuefortest1 === "UA" && (
-                    <td>
+                  {(valuefortest1 === "UA") && (
+                    <td
+                      className={`q1-input-${index} ${exceedsMaxMarks(row["INSEM-Q1"], valueForMaxMarks.CO_1) ? 'light-red-background' : ''}`}
+                    >
                       <input
                         type="text"
-                        className={`UA-input-${index}`}
-                        defaultValue={row["UA"] === 0 ? "FF" : row["UA"]}
+                        className={`q1-input-${index}`}
+                        defaultValue={
+                          row["INSEM-Q1"] === null ? "A" : row["INSEM-Q1"]
+                        }
+                        onChange={(e) => {
+                          let value = e.target.value.trim();
+                          if (/^[0-9]*$/.test(value)) {
+                            // If input is a number, update normally
+                            setData({ ...data, ["INSEM-Q1"]: value });
+                            handleMarksChange(
+                              index,
+                              "INSEM-Q1",
+                              parseInt(e.target.value, 10) || 0,
+                              e
+                            );
+
+                            if (exceedsMaxMarks(row["INSEM-Q1"], valueForMaxMarks.CO_1)) {
+                              toast.warn("Marks exceeded maximum marks.");
+                              e.target.classList.add('light-red-background');
+                            } else {
+                              e.target.classList.remove('light-red-background');
+                            }
+                          } else if (value === "a" || value === "A") {
+                            // If input is 'a' or 'A', update normally
+                            setData({ ...data, ["INSEM-Q1"]: null });
+                            handleMarksChange(index, "INSEM-Q1", null, e);
+                          } else {
+                            // Notify user about invalid input
+                            alert("Please enter only 'a' or a number.");
+                            e.preventDefault();
+                            return;
+                          }
+                        }}
+                      />
+                    </td>
+                  )}
+                  {(valuefortest1 === "UA") && (
+                    <td
+                      className={`q1-input-${index} ${exceedsMaxMarks(row["INSEM-Q2"], valueForMaxMarks.CO_1) ? 'light-red-background' : ''}`}
+                    >
+                      <input
+                        type="text"
+                        className={`q2-input-${index}`}
+                        defaultValue={
+                          row["INSEM-Q2"] === null ? "A" : row["INSEM-Q2"]
+                        }
+                        onChange={(e) => {
+                          let value = e.target.value.trim();
+                          if (/^[0-9]*$/.test(value)) {
+                            // If input is a number, update normally
+                            setData({ ...data, ["INSEM-Q2"]: value });
+                            handleMarksChange(
+                              index,
+                              "INSEM-Q2",
+                              parseInt(e.target.value, 10) || 0,
+                              e
+                            );
+
+                            if (exceedsMaxMarks(row["INSEM-Q2"], valueForMaxMarks.CO_1)) {
+                              toast.warn("Marks exceeded maximum marks.");
+                              e.target.classList.add('light-red-background');
+                            } else {
+                              e.target.classList.remove('light-red-background');
+                            }
+                          } else if (value === "a" || value === "A") {
+                            // If input is 'a' or 'A', update normally
+                            setData({ ...data, ["INSEM-Q2"]: null });
+                            handleMarksChange(index, "INSEM-Q2", null, e);
+                          } else {
+                            // Notify user about invalid input
+                            alert("Please enter only 'a' or a number.");
+                            e.preventDefault();
+                            return;
+                          }
+                        }}
+                      />
+                    </td>
+                  )}
+                  {(valuefortest1 === "UT-1" ||
+                    valuefortest1 === "UT-2" ||
+                    valuefortest1 === "UT-3" ||
+                    valuefortest1 === "UA") && (
+                      <td>
+                        {row["ENDSEM"] === null ? "A" : row["ENDSEM"]}
+                      </td>
+                    )}
+                  {valuefortest1 === "UA" && (
+                    <td
+                      className={`q1-input-${index} ${exceedsMaxMarksUA(row["UA"], 100) ? 'light-red-background' : ''}`}
+                    >
+                      <input
+                        type="text"
+                        // className={`q2-input-${index}`}
+                        defaultValue={row["UA"] === null ? "FF" : row["UA"]}
                         onChange={(e) => {
                           let value = e.target.value.trim();
                           if (/^[0-9]*$/.test(value)) {
@@ -863,6 +1062,13 @@ const Main_table = ({ tableName }) => {
                               parseInt(e.target.value, 10) || 0,
                               e
                             );
+
+                            if (exceedsMaxMarksUA(row["UA"], 100)) {
+                              toast.warn("Marks exceeded maximum marks.");
+                              e.target.classList.add('light-red-background');
+                            } else {
+                              e.target.classList.remove('light-red-background');
+                            }
                           } else if (
                             value === "f" ||
                             value === "F" ||
@@ -894,26 +1100,26 @@ const Main_table = ({ tableName }) => {
                     valuefortest1 === "UT-2" ||
                     valuefortest1 === "UT-3" ||
                     valuefortest1 === "UA") && (
-                    <td>
-                      {row["Total-UT1"] === null ? "A" : row["Total-UT1"]}
-                    </td>
-                  )}
+                      <td>
+                        {row["Total-UT1"] === null ? "A" : row["Total-UT1"]}
+                      </td>
+                    )}
                   {(valuefortest1 === "UT-2" ||
                     valuefortest1 === "UT-3" ||
                     valuefortest1 === "UA") && (
-                    <td>
-                      {row["Total-UT2"] === null ||
-                      row["UT2-Q1"] === null ||
-                      row["UT2-Q2"] === null
-                        ? "A"
-                        : row["Total-UT2"]}
-                    </td>
-                  )}
+                      <td>
+                        {row["Total-UT2"] === null ||
+                          row["UT2-Q1"] === null ||
+                          row["UT2-Q2"] === null
+                          ? "A"
+                          : row["Total-UT2"]}
+                      </td>
+                    )}
                   {(valuefortest1 === "UT-3" || valuefortest1 === "UA") && (
                     <td>
                       {row["Total-UT3"] === null ||
-                      row["UT3-Q1"] === null ||
-                      row["UT3-Q2"] === null
+                        row["UT3-Q1"] === null ||
+                        row["UT3-Q2"] === null
                         ? "A"
                         : row["Total-UT3"]}
                     </td>
@@ -929,13 +1135,13 @@ const Main_table = ({ tableName }) => {
         <Button onClick={insertData} className="leftbtn">
           Save Changed marks
         </Button>
-        
+
         <Button onClick={convertToExcel} className="leftbtn">
           Export to Excel
         </Button>
       </div>
       <div className="omkar">
-        <Button style={{marginLeft: '47%',marginBottom: '10px'}} className="p-[20px] font-bol" onClick={displayResult}>
+        <Button style={{ marginLeft: '47%', marginBottom: '10px' }} className="p-[20px] font-bol" onClick={displayResult}>
           {resultState ? "Attainment" : "Calculate Attainment"}
         </Button>
       </div>
@@ -945,8 +1151,8 @@ const Main_table = ({ tableName }) => {
       {resultState && (
         <div className="omkar">
           <Button onClick={generatePDF} className="leftbtn">
-          Export to PDF
-        </Button>
+            Export to PDF
+          </Button>
         </div>
       )}
     </>

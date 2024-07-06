@@ -426,10 +426,6 @@ const transporter = nodemailer.createTransport({
     user: 'wildlifewondersunveiled@gmail.com',
     pass: 'ialjcgryxzvcecgs',
     // type: 'OAuth2',
-    // clientId: '189735060081-73ugfrq07p4k9112tgqo13nlkm6rc3tm.apps.googleusercontent.com',
-    // clientSecret: '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',
-    // refreshToken: '1//0gIr4qFcqhUsUCgYIARAAGBASNwF-L9Ir6Y7LkZbkjgiD1Bea2-AVUeuEg4xxI1taTEUao3WclgeLxa1e8VJUDCG41w_eGusdZNw',
-    // accessToken: 'ya29.a0Ad52N392ZEaCNeFX_Qg_Iq-5sA37PN04DHbZ8iEvtTJfmd8LCLbF-A78iypxlyROQYACfh9ZEdm7IHcvlDiufjrbdWgqVMqP7360Ti3_too42EMTlP62fRSabfImsomAK2ohiMNE8OFQ98HRd5PteuU-8zGPz4ryRjs0aCgYKAcsSARMSFQHGX2MiqyqwjlOCY-WVL7zS4yFZBA0171'
   },
 });
 

@@ -1,18 +1,18 @@
 // controllers/studentsController.js
 const { pool } = require("../config/database");
-const{dropdownPool}=require("../config/database")
+const { dropdownPool } = require("../config/database")
 const ExcelJS = require("exceljs");
 const xlsx = require("xlsx");
 // const fileUpload = require("express-fileupload");
 const path = require("path");
 const createTableStudents = async (req, res) => {
-  const { tableName,degree_year,department,division } = req.params;
+  const { tableName, degree_year, department, division } = req.params;
   let divisionInNumber;
   // if(division!='ALL'){
   //   const divisionInNumber=Number(division);
   // }
-   division!='All' ?  divisionInNumber=Number(division): divisionInNumber=-1;
-  
+  division != 'All' ? divisionInNumber = Number(division) : divisionInNumber = -1;
+
   console.log(tableName);
   // Check if the table already exists
   const checkTableQuery = `
@@ -37,16 +37,16 @@ const createTableStudents = async (req, res) => {
       if (rowCount === 0) {
         // console.log(rowCount);
         return res.status(200).send([]);
-      }else if(division=='All'){
+      } else if (division == 'All') {
         const fetchDataQuery = `SELECT * FROM ${tableName} `;
         const tableData = await pool.query(fetchDataQuery);
         return res.status(200).send(tableData[0]);
 
-      }  else {
-        const queryToFetchDivisionCode=`SELECT Division_Code FROM department_and_year_wise_division WHERE (Degree_Year='${degree_year}' AND Department='${department}') AND Division=${divisionInNumber}`;
-        const resultOfDivisionCode=await dropdownPool.query(queryToFetchDivisionCode);
+      } else {
+        const queryToFetchDivisionCode = `SELECT Division_Code FROM department_and_year_wise_division WHERE (Degree_Year='${degree_year}' AND Department='${department}') AND Division=${divisionInNumber}`;
+        const resultOfDivisionCode = await dropdownPool.query(queryToFetchDivisionCode);
         // console.log(resultOfDivisionCode[0][0].Division_Code)
-        const divisionCode=resultOfDivisionCode[0][0].Division_Code;
+        const divisionCode = resultOfDivisionCode[0][0].Division_Code;
         const fetchDataQuery = `SELECT * FROM ${tableName} WHERE \`Roll No\` LIKE '${divisionCode}%'`;
         const tableData = await pool.query(fetchDataQuery);
         return res.status(200).send(tableData[0]);
@@ -65,6 +65,9 @@ const createTableStudents = async (req, res) => {
       \`UT2-Q2\` INT,
       \`UT3-Q1\` INT,
       \`UT3-Q2\` INT,
+      \`INSEM-Q1\` INT,
+      \`INSEM-Q2\` INT,
+      ENDSEM INT,
       UA INT,
       \`Total-UT1\` INT,
       \`Total-UT2\` INT,
@@ -95,7 +98,7 @@ const uploadExcelStudents = async (req, res) => {
     await excelFile.mv(filePath);
 
     // Call the function to process the Excel file
-    const result=await excelToMySQLArray(filePath, tableName);
+    const result = await excelToMySQLArray(filePath, tableName);
 
     if (result && result.error && result.error.includes("Duplicate entry")) {
       return res.status(400).send("Duplicate entries not allowed");
@@ -129,6 +132,9 @@ async function excelToMySQLArray(filePath, tableName) {
       "UT2-Q2",
       "UT3-Q1",
       "UT3-Q2",
+      "INSEM-Q1",
+      "INSEM-Q2",
+      "ENDSEM",
       "UA",
       "Total-UT1",
       "Total-UT2",
@@ -212,6 +218,9 @@ const updateDatabaseStudents = async (req, res) => {
           "UT2-Q2": q22,
           "UT3-Q1": q31,
           "UT3-Q2": q32,
+          "INSEM-Q1": iq1,
+          "INSEM-Q1": iq2,
+          "ENDSEM": endsem,
           UA: ua,
           "Total-UT1": tut1,
           "Total-UT2": tut2,
@@ -220,7 +229,8 @@ const updateDatabaseStudents = async (req, res) => {
         const query = `
           UPDATE ${tableName}
           SET \`UT1-Q1\` = ?, \`UT1-Q2\` = ?, \`UT2-Q1\` = ?, \`UT2-Q2\` = ?,
-              \`UT3-Q1\` = ?, \`UT3-Q2\` = ?, \`UA\` = ?, \`Total-UT1\` = ?,
+              \`UT3-Q1\` = ?, \`UT3-Q2\` = ?,\`INSEM-Q1\`=?,
+              \`INSEM-Q2\`=?,\`ENDSEM\`=?, \`UA\` = ?, \`Total-UT1\` = ?,
               \`Total-UT2\` = ?, \`Total-UT3\` = ?
           WHERE \`Roll No\` = ? AND \`Seat No\` = ?
         `;
@@ -231,6 +241,9 @@ const updateDatabaseStudents = async (req, res) => {
           q22,
           q31,
           q32,
+          iq1,
+          iq2,
+          endsem,
           ua === "FF" ? 0 : ua,
           tut1,
           tut2,
@@ -583,7 +596,7 @@ const saveTarget_averageData = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   } finally {
     if (connection) {
-        connection.release();
+      connection.release();
     }
   }
 };
@@ -591,32 +604,32 @@ const average_attainment_pastYears = async (req, res) => {
   const { tableName, startingYear } = req.params;
   // Calculate the past years of interest
   const pastYears = [
-      startingYear - 1,
-      startingYear - 2,
-      startingYear - 3
+    startingYear - 1,
+    startingYear - 2,
+    startingYear - 3
   ];
 
   let connection;
   try {
-      connection = await pool.getConnection();
-      // Query the database for rows from the specified table name and past years
-      const query = `
+    connection = await pool.getConnection();
+    // Query the database for rows from the specified table name and past years
+    const query = `
           SELECT *
           FROM yearwise_attainments
           WHERE TableName = ?
           AND Year IN (?, ?, ?)
       `;
-      const [rows] = await connection.query(query, [tableName, ...pastYears]);
+    const [rows] = await connection.query(query, [tableName, ...pastYears]);
 
-      // Send the retrieved rows to the frontend as a JSON response
-      res.status(200).json(rows);
+    // Send the retrieved rows to the frontend as a JSON response
+    res.status(200).json(rows);
   } catch (error) {
-      console.error('Error querying the database', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error querying the database', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   } finally {
-      if (connection) {
-          connection.release();
-      }
+    if (connection) {
+      connection.release();
+    }
   }
 };
 

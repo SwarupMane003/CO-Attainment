@@ -23,6 +23,7 @@ import UnauthorizedAlert from "./Alert";
 import TeacherCredentials from "./components/master/teacherCredentials";
 import TableWithInput from "./components/new_average";
 import AddTargetsDropdown from "./components/dropdown/AddTargetsDropdown";
+import DivisionAndDepartment from "./components/editDivisionAndDepartment";
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [excelData, setExcelData] = useState([]);
@@ -98,6 +99,17 @@ const App = () => {
               ) : (
                 <Route
                   path="/teacherCredentials"
+                  element={<UnauthorizedAlert2 />}
+                />
+              )}
+              {valueForRole === "HOD" ? (
+                <Route
+                  path="/edit-division&department"
+                  element={<DivisionAndDepartment />}
+                />
+              ) : (
+                <Route
+                  path="/edit-division&department"
                   element={<UnauthorizedAlert2 />}
                 />
               )}

@@ -115,20 +115,25 @@ const insertPattern = async (req, res) => {
         const result = await dropdownPool.query(sql, [PYear, AYear]);
         res.status(200).send('Pattern saved successfully');
     } catch (error) {
-            console.error('Error inserting pattern:', error);
-            res.status(500).send('Error in saving pattern');  
+        if (error.code === 'ER_DUP_ENTRY') {
+            console.log("im here")
+            res.send("Duplicate entry error: Pattern already exists.");
+        } else {
+            console.log("object")
+            res.status(500).send("Error inserting pattern: " + error.message);
+        }
     }
 }
 
 const fetchSubjects = async (req, res) => {
     try {
         const { tableName } = req.params;
-        const sql = `SELECT Subject_Name from subject_table where Name_Till_Sem='${tableName}'`;
+        const sql = `SELECT Course_Code,Subject_Name,Course_Name from subject_table where Name_Till_Sem='${tableName}'`;
         const result = await dropdownPool.query(sql);
-        const subjectNames = result[0].map(subject => subject.Subject_Name);
+        // const subjectNames = result[0].map(subject => subject.Subject_Name);
 
 
-        res.status(200).send(subjectNames);
+        res.status(200).send(result[0]);
 
     }
 
@@ -141,9 +146,9 @@ const fetchSubjects = async (req, res) => {
 
 const deleteSubject = async (req, res) => {
     try {
-        const { tableName, subject } = req.params;
-        console.log(tableName, subject);
-        const sql = `DELETE FROM subject_table where Name_Till_Sem='${tableName}' AND Subject_Name='${subject}'`;
+        const { tableName, code } = req.params;
+        console.log(tableName, code);
+        const sql = `DELETE FROM subject_table where Name_Till_Sem='${tableName}' AND Course_Code='${code}'`;
         const result = await dropdownPool.query(sql);
         console.log(result);
         res.status(200).send("Deleted Successfully!")
@@ -155,23 +160,67 @@ const deleteSubject = async (req, res) => {
 
 const addSubject = async (req, res) => {
     try {
-        const { tableName, inputValue } = req.params;
-        const sql = 'INSERT INTO subject_table (Name_Till_Sem, Subject_Name) VALUES (?, ?)';
-        const result = await dropdownPool.query(sql, [tableName, inputValue]);
-        res.status(200).send('Subject saved successfully');
+        const { tableName, inputCode, inputCourseAb, inputCourse } = req.params;
+        console.log(inputCode, inputCourseAb, inputCourse);
+        const sql = 'INSERT INTO subject_table (Name_Till_Sem, Course_Code,Subject_Name,Course_Name) VALUES (?, ?,?,?)';
+        const result = await dropdownPool.query(sql, [tableName, inputCode, inputCourseAb, inputCourse]);
+        res.status(200).send('Course saved successfully');
     } catch (error) {
         console.error('Error inserting pattern:', error);
         res.status(500).send('Internal Server Error');
     }
 }
 
-const handleCoPoAttainment=async(req,res)=>{
-    try{
+const fetchDepartment = async (req, res) => {
+    try {
+
+        const { department } = req.params;
+        const sql = `SELECT * from department_and_year_wise_division where Department='${department}';`
+        const result = await dropdownPool.query(sql);
+        res.status(200).send(result[0])
+    }
+    catch (error) {
+        res.status(500).send("Internal Server Error.")
+        console.log("Error :", error);
+    }
+}
+
+
+const addDepartmentDivision = async (req, res) => {
+    try {
+        const { department, degreeYear, division, divisionCode } = req.params;
+        const sql = 'INSERT INTO department_and_year_wise_division (Department, Degree_Year,Division,Division_Code) VALUES (?, ?,?,?)';
+        const result = await dropdownPool.query(sql, [department, degreeYear, division, divisionCode]);
+        res.status(200).send("Data saved successfully!")
+
+    }
+    catch (error) {
+        console.log("Error: ", error);
+        res.status(500).send('Internal Server Error');
+    }
+
+}
+
+const deleteDepartmentDivision = async (req, res) => {
+    try {
+        const { divisionCode } = req.params;
+        const sql = `DELETE FROM department_and_year_wise_division where Division_Code='${divisionCode}'`;
+        const result = await dropdownPool.query(sql);
+        res.status(200).send("Deleted Successfully!")
+
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
+const handleCoPoAttainment = async (req, res) => {
+    try {
         const { tableName } = req.params;
         // const {UA_CO_AT,}=req.body;
         // console.log(coValue)
 
-         // Check if entry with Main_Table_Name exists
+        // Check if entry with Main_Table_Name exists
         const checkQuery = `SELECT * FROM co_po_attainment WHERE Main_Table_Name = '${tableName}'`;
         const checkResult = await dropdownPool.query(checkQuery);
 
@@ -180,21 +229,18 @@ const handleCoPoAttainment=async(req,res)=>{
             const createQuery = `INSERT INTO co_po_attainment (Main_Table_Name,UA_CO_AT,UT_CO_attainment,\`Course Outcome\` ) VALUES ('${tableName}', 0, 0, 0)`;
             await dropdownPool.query(createQuery);
         }
-        
-        const UA_CO_AT=Number(req.body.UA_CO_AT);
-        const UT_CO_attainment=Number(req.body.UT_CO_attainment);
-        const Course_Outcome=Number(req.body.Course_Outcome);
 
-        let sqlquery=`UPDATE co_po_attainment SET  UA_CO_AT= ?,UT_CO_attainment = ?,\`Course Outcome\` = ? WHERE Main_Table_Name = '${tableName}'`;
+        const UA_CO_AT = Number(req.body.UA_CO_AT);
+        const UT_CO_attainment = Number(req.body.UT_CO_attainment);
+        const Course_Outcome = Number(req.body.Course_Outcome);
 
-        await dropdownPool.query(sqlquery,[UA_CO_AT,UT_CO_attainment,Course_Outcome]);
-        res.status(200).send({message:"posted successfully"});
-    }catch(error){
-        console.log("Error:",error);
-        res.status(500).send({message:"enternal server error"});
+        let sqlquery = `UPDATE co_po_attainment SET  UA_CO_AT= ?,UT_CO_attainment = ?,\`Course Outcome\` = ? WHERE Main_Table_Name = '${tableName}'`;
+
+        await dropdownPool.query(sqlquery, [UA_CO_AT, UT_CO_attainment, Course_Outcome]);
+        res.status(200).send({ message: "posted successfully" });
+    } catch (error) {
+        console.log("Error:", error);
+        res.status(500).send({ message: "enternal server error" });
     }
 }
-
-
-
-module.exports = { deletePatternAndYear, insertPattern, fetchPatternAndYear, handleGetPattern, handleGetAcadamicYear, handleGetDepartment, handleGetDivision, handleGetSubject, fetchSubjects, deleteSubject, addSubject,handleCoPoAttainment}
+module.exports = { deletePatternAndYear, insertPattern, fetchPatternAndYear, handleGetPattern, handleGetAcadamicYear, handleGetDepartment, handleGetDivision, handleGetSubject, fetchSubjects, deleteSubject, addSubject, addDepartmentDivision, fetchDepartment, deleteDepartmentDivision, handleCoPoAttainment }
