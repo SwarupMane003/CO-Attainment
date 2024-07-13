@@ -102,8 +102,8 @@ const DivisionAndDepartment = () => {
                     boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)',
                 }}
             >
-                <h2>Edit Department & Division</h2>
-                <label style={{ display: 'block', marginBottom: '8px' }}>Enter Department Abbreviation:</label>
+                <h2 style={{textAlign:'center',marginBottom:'20px'}}>Edit Department & Division</h2>
+                <label style={{ display: 'block', marginBottom: '8px' ,fontSize:'20px',marginLeft:'37px'}}>Enter Department Abbreviation:</label>
                 <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                     <div style={{ position: 'relative' }}>
                         <input
@@ -112,7 +112,7 @@ const DivisionAndDepartment = () => {
                             placeholder="Department"
                             value={department}
                             onChange={handleDepartmentChange}
-                            style={{ width: '100%', padding: '8px', marginBottom: '16px', border: '1px solid #ccc' }}
+                            style={{ width: '80%', padding: '8px', marginBottom: '16px', border: '1px solid #ccc' ,textAlign:'center', marginLeft:'30px'}}
                             required
                         />
                     </div>
@@ -128,6 +128,7 @@ const DivisionAndDepartment = () => {
                                 border: 'none',
                                 borderRadius: '4px',
                                 cursor: 'pointer',
+                                width:'65%'
                             }}
                         >
                             Add / Fetch

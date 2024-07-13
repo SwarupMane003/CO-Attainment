@@ -13,13 +13,11 @@ export default function Navbar() {
   const { setValueForRole } = UseData();
   useEffect(() => {
     const loggedInUserNameFromStorage = localStorage.getItem("Userdata");
-    const loggedInUserNameFromStorage1 = JSON.parse(
-      loggedInUserNameFromStorage
-    );
+    const loggedInUserNameFromStorage1 = JSON.parse(loggedInUserNameFromStorage);
     if (loggedInUserNameFromStorage) {
       setLoggedInUserName(loggedInUserNameFromStorage1.name);
     }
-    console.log(loggedInUserNameFromStorage)
+    console.log(loggedInUserNameFromStorage);
   }, []);
 
   const handleLogOut = () => {
@@ -30,7 +28,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: '#0096FF', borderRadius: '15px', marginTop: '35px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+    <nav className="navbar navbar-expand-lg navbar-light sticky-top" style={{ backgroundColor: '#0096FF', borderRadius: '15px', marginTop: '35px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
       <div className="container-fluid">
         <Link className="navbar-brand" to="/">
           <img src={logoImage} alt="Logo" style={{ maxHeight: '55px', borderRadius: '50%' }} />
@@ -65,7 +63,7 @@ export default function Navbar() {
                 <li><Link className="dropdown-item" to="/edit-pattern">Edit Pattern</Link></li>
                 <li><Link className="dropdown-item" to="/edit-subject">Edit Subject</Link></li>
                 <li className="nav-item">
-                  <Link className="dropdown-item" to="/edit-division&department" >
+                  <Link className="dropdown-item" to="/edit-division&department">
                     Edit Division & Department
                   </Link>
                 </li>
@@ -93,7 +91,5 @@ export default function Navbar() {
         </div>
       </div>
     </nav>
-
-
   );
 }

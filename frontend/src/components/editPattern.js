@@ -103,7 +103,8 @@ const EditPattern = () => {
                     boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)',
                 }}
             >
-                <h2>Edit Pattern</h2>
+                <h2 style={{textAlign:'center'}}>Edit Pattern</h2>
+                <label style={{ display: 'block', marginBottom: '8px' }}>Pattern:</label>
                 <div style={{ position: 'relative' }}>
                     <input
                         type="text"
@@ -135,10 +136,12 @@ const EditPattern = () => {
                         backgroundColor: '#4caf50',
                         color: 'white',
                         marginTop: '10px',
+                        marginLeft:'75px',
                         padding: '10px 15px',
                         border: 'none',
                         borderRadius: '4px',
                         cursor: 'pointer',
+                        width:'110px'
                     }}
                 >
                     Add

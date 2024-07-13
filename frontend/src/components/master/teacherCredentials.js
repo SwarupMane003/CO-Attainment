@@ -5,6 +5,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
+
 const TeacherCredentials = () => {
   const [file, setFile] = useState(null);
   const [showTeachersBool, setShowTeachersBool] = useState(false);
@@ -168,10 +170,18 @@ const TeacherCredentials = () => {
   };
   return (
     <>
-      <h1 style={{ textAlign: "center" }}>Insert Teacher's Data</h1>
-      <Button onClick={downloadSampleFile} style={{ margin: "3% 0 0 43%" }}>
-        Download Sample File
-      </Button>
+      <h1 style={{ textAlign: "center" ,marginTop:'10px'}}>Insert Teacher's Data</h1>
+      <Button 
+  onClick={downloadSampleFile} 
+  style={{ 
+    margin: "1% 0 0 43%", 
+    backgroundColor: "#4caf50", 
+    color: "white" 
+  }}
+>
+  Download Sample File
+</Button>
+
       <div className="accept-and-save">
         <input
           className="accept-file"
@@ -180,8 +190,13 @@ const TeacherCredentials = () => {
           accept=".xlsx"
         />
         <div className="omkar">
-          <Button variant="primary" onClick={handleSave} disabled={uploading}>
+          <Button variant="primary" onClick={handleSave} disabled={uploading}style={{ 
+     
+    backgroundColor: "#4caf50", 
+    color: "white" 
+  }}>
             {uploading ? "Uploading..." : "Upload Excel"}
+            
           </Button>
         </div>
       </div>
@@ -254,7 +269,12 @@ const TeacherCredentials = () => {
         <tfoot>
           <tr>
             <td colSpan="6" style={{ padding: "8px" }}>
-              <Button onClick={handleAddRow}>Add Row</Button>
+              <Button onClick={handleAddRow} style={{ 
+    
+    backgroundColor: "#4caf50", 
+    color: "white" 
+  }}>
+                Add Row</Button>
             </td>
           </tr>
         </tfoot>
@@ -263,10 +283,12 @@ const TeacherCredentials = () => {
       <Button
         onClick={handleSaveData}
         style={{
-          width: "30%",
+          width: "20%",
           textAlign: "center",
           alignItems: "center",
           marginLeft: "40%",
+          backgroundColor:"#4caf50",
+          marginBottom:'10px'
         }}
       >
         Save Data

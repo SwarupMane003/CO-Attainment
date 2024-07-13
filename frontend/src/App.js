@@ -24,6 +24,8 @@ import TeacherCredentials from "./components/master/teacherCredentials";
 import TableWithInput from "./components/new_average";
 import AddTargetsDropdown from "./components/dropdown/AddTargetsDropdown";
 import DivisionAndDepartment from "./components/editDivisionAndDepartment";
+import Guidelines from "./components/guidelines/Guidelines";
+import Aboutus from "./components/aboutUs/Aboutus";
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [excelData, setExcelData] = useState([]);
@@ -73,6 +75,14 @@ const App = () => {
           <>
             <Navbar title="Text2" about="About Info" />
             <Routes>
+            <Route
+                  path="/guidelines"
+                  element={<Guidelines />}
+                />
+                <Route
+                  path="/about"
+                  element={<Aboutus />}
+                />
               <Route path="/average" element={<AddTargetsDropdown />} />
               <Route path="/Home" element={<Dropdown />} />
               <Route path="/" element={<Dropdown />} />
@@ -112,6 +122,7 @@ const App = () => {
                   path="/edit-division&department"
                   element={<UnauthorizedAlert2 />}
                 />
+                
               )}
             </Routes>
             <Footer />

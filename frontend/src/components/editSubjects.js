@@ -8,7 +8,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { UseData } from '../NewContext';
 
 const EditSubject = () => {
-    // State variables for dropdown values
     const [data, setData] = useState([]);
     const [valuefordepartmentArray, setValuedepartmentArray] = useState([]);
     const { valueforyearlabel, setvalueforyearlabel } = UseData();
@@ -199,6 +198,23 @@ const EditSubject = () => {
         }
     };
 
+    const dropdownStyle = {
+        width: '250px',
+        margin: '10px auto',
+    };
+
+    const buttonStyle = {
+        backgroundColor: '#4caf50',
+        color: 'white',
+        marginTop: '10px',
+        padding: '10px 15px',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        width: '250px',
+        textAlign: 'center'
+    };
+
     return (
         <>
             <div
@@ -209,9 +225,10 @@ const EditSubject = () => {
                     border: '1px solid #ccc',
                     borderRadius: '5px',
                     boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)',
+                    width: '500px'
                 }}
             >
-                <h2>Edit Subject</h2>
+                <h2 style={{ textAlign: 'center' }}>Edit Subject</h2>
                 <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                     <label style={{ marginBottom: '20px' }}>
                         Pattern:
@@ -224,6 +241,7 @@ const EditSubject = () => {
                             isSearchable
                             placeholder="Select Pattern"
                             required
+                            styles={{ container: (provided) => ({ ...provided, ...dropdownStyle }) }}
                         />
                     </label>
                     <br />
@@ -240,6 +258,7 @@ const EditSubject = () => {
                             isSearchable
                             placeholder="Select Year"
                             required
+                            styles={{ container: (provided) => ({ ...provided, ...dropdownStyle }) }}
                         />
                     </label>
                     <br />
@@ -255,6 +274,7 @@ const EditSubject = () => {
                             isSearchable
                             placeholder="department"
                             required
+                            styles={{ container: (provided) => ({ ...provided, ...dropdownStyle }) }}
                         />
                     </label>
                     <br />
@@ -270,21 +290,14 @@ const EditSubject = () => {
                             isSearchable
                             placeholder="Select Semester"
                             required
+                            styles={{ container: (provided) => ({ ...provided, ...dropdownStyle }) }}
                         />
                     </label>
 
                     <div>
                         <button
                             onClick={handleFetch}
-                            style={{
-                                backgroundColor: '#4caf50',
-                                color: 'white',
-                                marginTop: '10px',
-                                padding: '10px 15px',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                            }}
+                            style={buttonStyle}
                         >
                             Fetch
                         </button>
