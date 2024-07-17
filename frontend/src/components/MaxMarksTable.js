@@ -7,7 +7,7 @@ import { f } from "html2pdf.js";
 
 function MaxMarkTable({ tableName }) {
     // 
-    const [data, setData] = useState(0);
+    const [data, setData] = useState();
 
 
     // to store maximunm marks of each co;

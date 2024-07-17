@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { Button } from 'react-bootstrap';
 function BelowTable({ containerRef, tableName }) {
 
-  // for NewContext.js to use in calcualation nad values are used not modified
+  // for NewContext.js to use in calcualation and values are used not modified
   const { countLevelOneUT, setCountLevelOneUT } = UseData();
   const { countLevelOneUA, setCountLevelOneUA } = UseData();
 
@@ -19,7 +19,7 @@ function BelowTable({ containerRef, tableName }) {
 
   // this to hide beelow_table and dispaly below_table
   const { resultState, setResultState } = UseData();
-
+  const{valueforacadamicyear, setValueForAcadamicYear}=UseData();
   const [showAttainment,setShowAttainment]=useState(false);
   // FOR count presnt student
   const [presentStudent, setPresentStudent] = useState([{
@@ -103,9 +103,9 @@ function BelowTable({ containerRef, tableName }) {
   }]);
 
   const [coValue,setCovalue]=useState({
-    UA_CO_AT:0,
-    UT_CO_attainment:0,
-    Course_Outcome:0
+    CO_UT:0,
+    CO_UA:0,
+    CO_AT:0
   })
   useEffect(() => {
     // countPresent();
@@ -115,7 +115,7 @@ function BelowTable({ containerRef, tableName }) {
     countLevelOneStudent();
     countLevelTwoStudent();
     countLevelThreeStudent();
-
+    console.log(countLevelOneUT);
   }, []);
 
   const handleOnChange = (e) => {
@@ -130,12 +130,12 @@ function BelowTable({ containerRef, tableName }) {
 
     setCovalue(prevState => {
       // Perform the calculations
-      const UA_CO_AT = (((((countLevelOne[0].sum_UA * 100) / presentStudent[0].sum_UA) / countLevelOneUA) + (((countLevelTwo[0].sum_UA * 100) / presentStudent[0].sum_UA) * 2 / countLevelTwoUA) + (((countLevelThree[0].sum_UA * 100) / presentStudent[0].sum_UA) * 3 / countLevelThreeUA)) / 6).toFixed(2);
+      const CO_UA = (((((countLevelOne[0].sum_UA * 100) / presentStudent[0].sum_UA) / countLevelOneUA) + (((countLevelTwo[0].sum_UA * 100) / presentStudent[0].sum_UA) * 2 / countLevelTwoUA) + (((countLevelThree[0].sum_UA * 100) / presentStudent[0].sum_UA) * 3 / countLevelThreeUA)) / 6).toFixed(2);
       // const UA_CO_AT =((((((((((countLevelOne[0].sum_insemq1 * 100) / presentStudent[0].sum_insemq1) / countLevelOneUA) + (((countLevelTwo[0].sum_insemq1 * 100) / presentStudent[0].sum_insemq1) * 2 / countLevelTwoUA) + (((countLevelThree[0].sum_insemq1 * 100) / presentStudent[0].sum_insemq1) * 3 / countLevelThreeUA)) / 6)+
       //   (((((countLevelOne[0].sum_insemq2 * 100) / presentStudent[0].sum_insemq2) / countLevelOneUA) + (((countLevelTwo[0].sum_insemq2 * 100) / presentStudent[0].sum_insemq2) * 2 / countLevelTwoUA) + (((countLevelThree[0].sum_insemq2 * 100) / presentStudent[0].sum_insemq2) * 3 / countLevelThreeUA)) / 6))/2))+
       //   (((((((countLevelOne[0].sum_endsem * 100) / presentStudent[0].sum_UA) / countLevelOneUA) + (((countLevelTwo[0].sum_endsem * 100) / presentStudent[0].sum_UA) * 2 / countLevelTwoUA) + (((countLevelThree[0].sum_endsem * 100) / presentStudent[0].sum_UA) * 3 / countLevelThreeUA)) / 6))))/2).toFixed(2) ;
       
-      const UT_CO_attainment = (((((((((countLevelOne[0].sum_q11 * 100) / presentStudent[0].sum_q11) / countLevelOneUT)) + ((((countLevelTwo[0].sum_q11 * 100) / presentStudent[0].sum_q11) * 2 / countLevelTwoUT)) + ((((countLevelThree[0].sum_q11 * 100) / presentStudent[0].sum_q11) * 3 / countLevelThreeUT))) / 6)) +
+      const CO_UT = (((((((((countLevelOne[0].sum_q11 * 100) / presentStudent[0].sum_q11) / countLevelOneUT)) + ((((countLevelTwo[0].sum_q11 * 100) / presentStudent[0].sum_q11) * 2 / countLevelTwoUT)) + ((((countLevelThree[0].sum_q11 * 100) / presentStudent[0].sum_q11) * 3 / countLevelThreeUT))) / 6)) +
                     (((((((countLevelOne[0].sum_q12 * 100) / presentStudent[0].sum_q12) / countLevelOneUT)) + ((((countLevelTwo[0].sum_q12 * 100) / presentStudent[0].sum_q12) * 2 / countLevelTwoUT)) + ((((countLevelThree[0].sum_q12 * 100) / presentStudent[0].sum_q11) * 3 / countLevelThreeUT))) / 6)) +
                     (((((((countLevelOne[0].sum_q21 * 100) / presentStudent[0].sum_q21) / countLevelOneUT)) + ((((countLevelTwo[0].sum_q21 * 100) / presentStudent[0].sum_q21) * 2 / countLevelTwoUT)) + ((((countLevelThree[0].sum_q21 * 100) / presentStudent[0].sum_q21) * 3 / countLevelThreeUT))) / 6)) +
                     (((((((countLevelOne[0].sum_q22 * 100) / presentStudent[0].sum_q22) / countLevelOneUT)) + ((((countLevelTwo[0].sum_q22 * 100) / presentStudent[0].sum_q22) * 2 / countLevelTwoUT)) + ((((countLevelThree[0].sum_q22 * 100) / presentStudent[0].sum_q22) * 3 / countLevelThreeUT))) / 6)) +
@@ -144,19 +144,21 @@ function BelowTable({ containerRef, tableName }) {
     
                         
       // Ensure that each value is not greater than 1
-      const clampedUA_CO_AT = Math.min(UA_CO_AT, 1);
-      const clampedUT_CO_attainment = Math.min(UT_CO_attainment, 1);
+      const clampedUA_CO_AT = Math.min(CO_UT, 1);
+      const clampedUT_CO_attainment = Math.min(CO_UA, 1);
       
       // Update the state
       return {
         ...prevState,
-        UA_CO_AT: clampedUA_CO_AT,
-        UT_CO_attainment: clampedUT_CO_attainment,
-        Course_Outcome: ((0.7*clampedUA_CO_AT)+(0.3*clampedUT_CO_attainment)).toFixed(2)
+        CO_UT: clampedUA_CO_AT,
+        CO_UA: clampedUT_CO_attainment,
+        CO_AT: ((0.7*clampedUA_CO_AT)+(0.3*clampedUT_CO_attainment)).toFixed(2)
       };
     });
     
   }
+
+
   // to count present student
   const countPresentStudent = async () => {
     try {
@@ -235,26 +237,57 @@ function BelowTable({ containerRef, tableName }) {
       console.error('Error in getting data:', error);
     }
 
-    console.log(countLevelTwoUT);
+    // console.log(countLevelTwoUT);
   };
 
-  const handleCoPoAttainment=async()=>{
+  const handleCoPoAttainment=async(e)=>{
+    e.preventDefault();
     try{
-      const result=await axios.post(`http://localhost:3000/co_po/${tableName}`,coValue);
-      if(result.status==200){
-        toast.success("Saved!");
-      }
+      let year = valueforacadamicyear.label;
+      const result=await axios.post(`http://localhost:3000/handleCoPoAttainment/${tableName}/${year}`,coValue);
+      // if(result.status==200){
+      //   toast.success("Saved!");
+      // }
     }catch(error){
       console.log("Error while posting",error);
     }
   }
 
-  // <th>Ensem-Q1</th>
-  //             <th>Ensem-Q2</th>
-  //             <th>Endsem</th>
+  const updateAchivedAttainment=async(e)=>{
+    // e.preventDefault();
+    try{
+      const UT_66=((((countLevelThree[0].sum_q11 * 100) / presentStudent[0].sum_q11)+((countLevelThree[0].sum_q12 * 100) / presentStudent[0].sum_q12)+((countLevelThree[0].sum_q21 * 100) / presentStudent[0].sum_q21)+((countLevelThree[0].sum_q22 * 100) / presentStudent[0].sum_q22)+((countLevelThree[0].sum_q31 * 100) / presentStudent[0].sum_q31)+((countLevelThree[0].sum_q32 * 100) / presentStudent[0].sum_q32))/6).toFixed(2);
+      
+      const UA_66=((countLevelThree[0].sum_UA * 100) / presentStudent[0].sum_UA).toFixed(2);
 
-  //  table =>className="result-table-container"
-  // border="1"
+      const UT_60=((((countLevelTwo[0].sum_q11 * 100) / presentStudent[0].sum_q11)+((countLevelTwo[0].sum_q12 * 100) / presentStudent[0].sum_q12)+((countLevelTwo[0].sum_q21 * 100) / presentStudent[0].sum_q21)+((countLevelTwo[0].sum_q22 * 100) / presentStudent[0].sum_q22)+((countLevelTwo[0].sum_q31 * 100) / presentStudent[0].sum_q31)+((countLevelTwo[0].sum_q32 * 100) / presentStudent[0].sum_q32))/6).toFixed(2);
+
+      const UA_60=((countLevelTwo[0].sum_UA * 100) / presentStudent[0].sum_UA).toFixed(2);
+
+      const UT_PASS=((((countLevelOne[0].sum_q11 * 100) / presentStudent[0].sum_q11)+((countLevelOne[0].sum_q12 * 100) / presentStudent[0].sum_q12)+((countLevelOne[0].sum_q21 * 100) / presentStudent[0].sum_q21)+((countLevelOne[0].sum_q22 * 100) / presentStudent[0].sum_q22)+((countLevelOne[0].sum_q31 * 100) / presentStudent[0].sum_q31)+((countLevelOne[0].sum_q32 * 100) / presentStudent[0].sum_q32))/6).toFixed(2);
+
+      const UA_PASS=((countLevelOne[0].sum_UA * 100) / presentStudent[0].sum_UA).toFixed(2);
+
+      let year=valueforacadamicyear.label;
+      const result=await axios.post(`http://localhost:3000/postUpdatedAchivedAttainment/${tableName}/${year}`,{UT_66,
+        UA_66,
+        UT_60,
+        UA_60,
+        UT_PASS,
+        UA_PASS});
+      // if(result.status==200){
+      //   toast.success("Saved!");
+      // }
+    }catch(error){
+      console.log("Error while posting",error);
+    }
+  }
+
+
+  const handelOnClick=()=>{
+    updateAchivedAttainment();
+    handleSetCO();
+  }
   return (
     <>
       <div id='below' ref={containerRef} >
@@ -493,7 +526,7 @@ function BelowTable({ containerRef, tableName }) {
             <td></td>
           </tbody>
           <tbody>
-            <td>UT_CO_attainment</td>
+            <td>CO_UA</td>
             <td colSpan="6" style={{ textAlign: 'center', verticalAlign: 'middle' }} >{Math.min((((((((((countLevelOne[0].sum_q11 * 100) / presentStudent[0].sum_q11) / countLevelOneUT)) + ((((countLevelTwo[0].sum_q11 * 100) / presentStudent[0].sum_q11) * 2 / countLevelTwoUT)) + ((((countLevelThree[0].sum_q11 * 100) / presentStudent[0].sum_q11) * 3 / countLevelThreeUT))) / 6)) +
               (((((((countLevelOne[0].sum_q12 * 100) / presentStudent[0].sum_q12) / countLevelOneUT)) + ((((countLevelTwo[0].sum_q12 * 100) / presentStudent[0].sum_q12) * 2 / countLevelTwoUT)) + ((((countLevelThree[0].sum_q12 * 100) / presentStudent[0].sum_q11) * 3 / countLevelThreeUT))) / 6)) +
               (((((((countLevelOne[0].sum_q21 * 100) / presentStudent[0].sum_q21) / countLevelOneUT)) + ((((countLevelTwo[0].sum_q21 * 100) / presentStudent[0].sum_q21) * 2 / countLevelTwoUT)) + ((((countLevelThree[0].sum_q21 * 100) / presentStudent[0].sum_q21) * 3 / countLevelThreeUT))) / 6)) +
@@ -509,7 +542,7 @@ function BelowTable({ containerRef, tableName }) {
       </div>
       <div style={{ marginLeft: "5%", marginBottom: "3%" }}>
   <button 
-    onClick={handleSetCO} 
+    onClick={handelOnClick} 
     className='bg-primary mt-5' 
     style={{ borderRadius: "5%", width: "200px", height: "50px" }} // Adjust width and height as needed
   >
@@ -527,15 +560,15 @@ function BelowTable({ containerRef, tableName }) {
           <tbody>
             <tr>
               <td>UA_CO_Attainment</td>
-              <td><input name='UA_CO_AT' defaultValue={coValue.UA_CO_AT}  onChange={(event)=>handleOnChange(event)}></input></td>
+              <td><input name='CO_UT' defaultValue={coValue.CO_UT}  onChange={(event)=>handleOnChange(event)}></input></td>
             </tr>
             <tr>
-              <td>UT_CO_Attainment</td>
-              <td><input  name='UT_CO_attainment' defaultValue={coValue.UT_CO_attainment} onChange={(event)=>handleOnChange(event)}></input></td>
+              <td>CO_UA</td>
+              <td><input  name='CO_UA' defaultValue={coValue.CO_UA} onChange={(event)=>handleOnChange(event)}></input></td>
             </tr>
             <tr>
               <td>Course Outcome</td>
-              <td><input  name='Course_Outcome' defaultValue={coValue.Course_Outcome}  onChange={(event)=>handleOnChange(event)}></input></td>
+              <td><input  name='CO_AT' defaultValue={coValue.CO_AT}  onChange={(event)=>handleOnChange(event)}></input></td>
             </tr>
           </tbody>
         </table>

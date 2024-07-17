@@ -22,8 +22,9 @@ const Main_table = ({ tableName }) => {
 
   const containerRef = useRef(null);
   const { data, setData } = UseData();
-  const [isShow, setIsShow] = useState(false);
-  const [showbtn, setShowbtn] = useState(false);
+  const{createTable}=UseData();
+  // const [isShow, setIsShow] = useState(false);
+  // const [showbtn, setShowbtn] = useState(false);
   const { valuefortest1, setValuefortest1 } = UseData();
   const { valueforacadamicyearlabel, setValueForAcademicYearlabel } = UseData();
   const { valuefordepartmentlabel, setvaluefordepartmentlabel } = UseData();
@@ -33,70 +34,14 @@ const Main_table = ({ tableName }) => {
   const { valuefordivisionlabel, setValuefordivisionlabel } = UseData();
   const { resultState, setResultState } = UseData() || {};
   const { valueForMaxMarks, setValueForMaxMarks } = UseData();
-  const createTable = async () => {
-    try {
-      setShowbtn(true);
-      const response = await axios.get(
-        `http://localhost:3000/createTable/${tableName}`
-      );
-      if (response.data.length === 0) {
-        // Display toast notification for empty table
-        toast.warn("Table is empty. Upload to the database.");
-      } else if (response.status === 200) {
-        if (response.data === "Table created successfully.") {
-          // Table created successfully, show success notification
-          toast.success("Table Created Successfully. Enter Data.");
-        } else {
-          // Table data fetched successfully, show success notification
-          toast.success("Data Fetched Successfully.");
-          // Handle table data if needed
-          if (response.data.length === 0) {
-            // Display toast notification for empty table
-            toast.warning("Table is empty. Upload to the database.");
-          } else {
-            const updatedData = response.data.map((row) => {
-              const totalUT1 =
-                row["UT1-Q1"] !== null && row["UT1-Q2"] !== null
-                  ? row["UT1-Q1"] + row["UT1-Q2"]
-                  : null;
-              const totalUT2 =
-                row["UT2-Q1"] !== null && row["UT2-Q2"] !== null
-                  ? row["UT2-Q1"] + row["UT2-Q2"]
-                  : null;
-              const totalUT3 =
-                row["UT3-Q1"] !== null && row["UT3-Q2"] !== null
-                  ? row["UT3-Q1"] + row["UT3-Q2"]
-                  : null;
-
-              const endsem =
-                row["INSEM-Q1"] !== null && row["INSEM-Q2"] !== null && row["UA"] !== null
-                  ? row["UA"] - row["INSEM-Q1"] - row["INSEM-Q2"]
-                  : null;
-              return {
-                ...row,
-                ["Total-UT1"]: totalUT1,
-                ["Total-UT2"]: totalUT2,
-                ["Total-UT3"]: totalUT3,
-                ["ENDSEM"]: endsem,
-              };
-            });
-
-            setData(updatedData);
-          }
-        }
-      } else {
-        // Unexpected response, handle it
-        console.error("Unexpected response:", response);
-        // Handle unexpected response if needed
-      }
-    } catch (error) {
-      console.error("Error creating table:", error);
-      // Handle error if needed
-    }
-  };
-
+  const [trigger,setTrigger]=useState(false);
+  
+  const{valueforacadamicyear, setValueForAcadamicYear}=UseData();
+  let updatedData1;
+  
   useEffect(() => {
-    console.log(data);
+    // createTable(tableName);
+    
     const updatedData = data.map((row) => {
       const totalUT1 =
         row["UT1-Q1"] !== null && row["UT1-Q2"] !== null
@@ -636,6 +581,8 @@ const Main_table = ({ tableName }) => {
     return numericValue > (maxValue !== null ? maxValue : 100);
   };
 
+
+
   return (
     <>
       <Level tableName={tableName} />
@@ -1035,9 +982,7 @@ const Main_table = ({ tableName }) => {
                       />
                     </td>
                   )}
-                  {(valuefortest1 === "UT-1" ||
-                    valuefortest1 === "UT-2" ||
-                    valuefortest1 === "UT-3" ||
+                  {(
                     valuefortest1 === "UA") && (
                       <td>
                         {row["ENDSEM"] === null ? "A" : row["ENDSEM"]}

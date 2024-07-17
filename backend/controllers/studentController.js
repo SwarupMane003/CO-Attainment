@@ -600,6 +600,7 @@ const saveTarget_averageData = async (req, res) => {
     }
   }
 };
+
 const average_attainment_pastYears = async (req, res) => {
   const { tableName, startingYear } = req.params;
   // Calculate the past years of interest
@@ -617,7 +618,6 @@ const average_attainment_pastYears = async (req, res) => {
           SELECT *
           FROM yearwise_attainments
           WHERE TableName = ?
-          AND Year IN (?, ?, ?)
       `;
     const [rows] = await connection.query(query, [tableName, ...pastYears]);
 
@@ -633,7 +633,156 @@ const average_attainment_pastYears = async (req, res) => {
   }
 };
 
+const fetchAverageOfLevelFromYearwiseAttainment=async(req,res)=>{
+    const{tableName,year}=req.params;
+    // console.log(tableName)
+    // console.log(year)
+    let yearArray=year.split("-");
+    let yearString=yearArray[0];
+    // console.log(yearArray[0]);
+    let yearNumber=Number(yearString);
+    let tt=tableName.substring(0,5);
+    let tt1=tableName.substring(17);
+    let tableName1=tt+tt1;
+    let query = `
+    SELECT sum(UT_66) as UT_66, sum(UA_66) AS UA_66, sum(UT_60) AS UT_60, sum(UA_60) AS UA_60, sum(UT_PASS) AS UT_PASS, sum(UA_PASS) AS UA_PASS, count(*) as count
+    FROM yearwise_attainments
+    WHERE YEAR BETWEEN '${yearNumber - 3}' AND ${yearNumber - 1}
+    AND TableName LIKE "%${tableName1}%"
+`;
 
+    let query1=`SELECT T_UT_66,T_UA_66,T_UT_60,T_UA_60,T_UT_PASS,T_UA_PASS FROM yearwise_attainments
+    WHERE YEAR ='${yearNumber}' 
+    AND TableName LIKE "%${tableName1}%"`;
+    try{
+          const result=await pool.query(query1);
+          if(result[0].length==0){
+            result=await pool.query(query);
+          }
+          // console.log(result[0]);
+          res.status(200).send(result[0][0]);
+    }catch(error){
+      console.error('Error querying the database', error);
+      res.status(500).send({message:"Error while sending data"});
+    }
+}
+
+const postTargetInYearwiseAttainment=async(req,res)=>{
+  const{tableName,year}=req.params;
+  const{countLevelOneUT,
+    countLevelOneUA,
+    countLevelTwoUT,
+    countLevelTwoUA,
+    countLevelThreeUT,
+    countLevelThreeUA}=req.body;
+ 
+  // console.log(year)
+  let yearArray=year.split("-");
+  let yearString=yearArray[0];
+  // console.log(yearArray[0]);
+  let yearNumber=Number(yearString);
+  let tt=tableName.substring(0,5);
+  let tt1=tableName.substring(17);
+  let tableName1=tt+tt1;
+  
+  const T_UT_66=countLevelThreeUT;
+  const T_UA_66=Number(countLevelThreeUA);
+  const T_UT_60=Number(countLevelTwoUT);
+  const T_UA_60=Number(countLevelTwoUA);
+  const T_UT_PASS=Number(countLevelOneUT);
+  const T_UA_PASS=Number(countLevelOneUA);
+  let query = `
+  UPDATE yearwise_attainments
+    SET T_UT_66 = ?,
+    T_UA_66 = ?,
+    T_UT_60 = ?,
+    T_UA_60 = ?,
+    T_UT_PASS = ?,
+    T_UA_PASS = ?
+  WHERE YEAR = '${yearNumber}' 
+  AND TableName LIKE "%${tableName1}%";`
+;
+  try{
+
+    const checkQuery = `SELECT T_UT_66 FROM yearwise_attainments WHERE YEAR ='${yearNumber}' AND TableName LIKE "%${tableName1}%"`;
+    const checkResult = await pool.query(checkQuery);
+
+    if (checkResult[0].length === 0) {
+      // If Main_Table_Name entry doesn't exist, create it with default values
+      const createQuery = `INSERT INTO yearwise_attainments(TableName,Year,UT_66,UA_66,UT_60,UA_60,UT_PASS,UA_PASS,CO_UT,CO_UA,CO_AT,T_UT_66,T_UA_66,T_UT_60,T_UA_60,T_UT_PASS,T_UA_PASS,T_CO_UT,T_CO_UA,T_CO_AT) VALUES ('${tableName1}','${yearNumber}',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1)`;
+      await pool.query(createQuery);
+    }
+
+    await pool.query(query,[T_UT_66,T_UA_66,T_UT_60,T_UA_60,T_UT_PASS,T_UA_PASS]);
+    res.status(200).send({message:"Success"});
+  }catch(error){
+    console.error('Error querying the database', error);
+    res.status(500).send({message:"Error while sending data"});
+  }
+}
+
+const postUpdatedAchivedAttainment=async(req,res)=>{
+  const{tableName,year}=req.params;
+  const{
+  UT_66,
+  UA_66,
+  UT_60,
+  UA_60,
+  UT_PASS,
+  UA_PASS
+  }=req.body;
+ 
+  // console.log(year)
+  let yearArray=year.split("-");
+  let yearString=yearArray[0];
+  // console.log(yearArray[0]);
+  let yearNumber=Number(yearString);
+  let tt=tableName.substring(0,5);
+  let tt1=tableName.substring(17);
+  let tableName1=tt+tt1;
+  let query=`UPDATE yearwise_attainments
+    SET UT_66 = ?,
+    UA_66 = ?,
+    UT_60 = ?,
+    UA_60 = ?,
+    UT_PASS = ?,
+    UA_PASS = ?
+  WHERE YEAR = '${yearNumber}' 
+  AND TableName LIKE "%${tableName1}%";`
+  try{
+    await pool.query(query,[UT_66,UA_66,UT_60,UA_60,UT_PASS,UA_PASS]);
+    res.status(200).send({message:"success"});
+  }catch(error){
+    console.error('Error querying the database', error);
+    res.status(500).send({message:"Error while updating data"});
+  }
+
+}
+
+
+const handleCoPoAttainment = async (req, res) => {
+  try {
+      const { tableName,year } = req.params;      
+      let yearArray=year.split("-");
+      let yearString=yearArray[0];
+      // console.log(yearArray[0]);
+      let yearNumber=Number(yearString);
+      let tt=tableName.substring(0,5);
+      let tt1=tableName.substring(17);
+      let tableName1=tt+tt1;
+      const CO_UT = parseFloat(req.body.CO_UT);
+      const CO_UA = parseFloat(req.body.CO_UA);
+      const CO_AT = parseFloat(req.body.CO_AT);
+
+      let sqlquery = `UPDATE yearwise_attainments SET  CO_UT= ?,CO_UA = ?,CO_AT = ? WHERE Year = '${yearNumber}'  AND TableName Like "%${tableName1}%";`
+
+      await pool.query(sqlquery, [CO_UT,CO_UA,CO_AT]);
+      res.status(200).send({ message: "posted successfully" });
+  } catch (error) {
+      console.log("Error:", error);
+      res.status(500).send({ message: "enternal server error" });
+  }
+}
 
 module.exports = {
   createTableStudents,
@@ -648,5 +797,9 @@ module.exports = {
   getMaxMarks,
   updateMaxMarks,
   saveTarget_averageData,
-  average_attainment_pastYears
+  average_attainment_pastYears,
+  fetchAverageOfLevelFromYearwiseAttainment,
+  postTargetInYearwiseAttainment,
+  postUpdatedAchivedAttainment,
+  handleCoPoAttainment,
 };

@@ -14,7 +14,11 @@ const {
   getMaxMarks,
   updateMaxMarks,
   saveTarget_averageData,
-  average_attainment_pastYears
+  average_attainment_pastYears,
+  fetchAverageOfLevelFromYearwiseAttainment,
+  postTargetInYearwiseAttainment,
+  postUpdatedAchivedAttainment,
+  handleCoPoAttainment,
 } = require("../controllers/studentController");
 
 router.get("/createTable/:tableName/:degree_year/:department/:division", createTableStudents);
@@ -30,4 +34,8 @@ router.post("/update_marks/:tableName", updateMaxMarks);
 router.get("/max_marks_for_each_co/:tableName", getMaxMarks);
 router.post("/saveAverageTarget/:tableName",saveTarget_averageData);
 router.get("/average_attainment_pastYears/:tableName/:startingYear", average_attainment_pastYears);
+router.get("/fetchAverageOfLevelFromYearwiseAttainment/:tableName/:year",fetchAverageOfLevelFromYearwiseAttainment);
+router.post("/postTargetInYearwiseAttainment/:tableName/:year",postTargetInYearwiseAttainment);
+router.post("/postUpdatedAchivedAttainment/:tableName/:year",postUpdatedAchivedAttainment);
+router.post("/handleCoPoAttainment/:tableName/:year",handleCoPoAttainment);
 module.exports = router;

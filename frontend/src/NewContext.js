@@ -10,13 +10,13 @@ export const ContextProvider = ({ children }) => {
   const [valuefortest1, setValuefortest1] = useState();
 
   // this hook to be set in level.js and used in below_table.js
-  const [countLevelOneUT, setCountLevelOneUT] = useState(82);
-  const [countLevelOneUA, setCountLevelOneUA] = useState(97);
-  const [countLevelTwoUT, setCountLevelTwoUT] = useState(69);
-  const [countLevelTwoUA, setCountLevelTwoUA] = useState(83);
+  const [countLevelOneUT, setCountLevelOneUT] = useState();
+  const [countLevelOneUA, setCountLevelOneUA] = useState();
+  const [countLevelTwoUT, setCountLevelTwoUT] = useState();
+  const [countLevelTwoUA, setCountLevelTwoUA] = useState();
 
-  const [countLevelThreeUT, setCountLevelThreeUT] = useState(61);
-  const [countLevelThreeUA, setCountLevelThreeUA] = useState(76);
+  const [countLevelThreeUT, setCountLevelThreeUT] = useState();
+  const [countLevelThreeUA, setCountLevelThreeUA] = useState();
 
 
   // this hook to store toggle button of show result
@@ -26,6 +26,7 @@ export const ContextProvider = ({ children }) => {
   const [valueforacadamicyearlabel, setValueForAcademicYearlabel] = useState();
   const [valuefordepartmentlabel, setvaluefordepartmentlabel] = useState();
   const [valueforyearlabel, setvalueforyearlabel] = useState();
+  const [valueforacadamicyear, setValueForAcadamicYear] = useState();
   const [valueforsubjectlabel, setvalueforsubjectlabel] = useState();
   const [valueforsemlabel, setvalueforsemlabel] = useState();
   const [valuefordivisionlabel, setValuefordivisionlabel] = useState();
@@ -49,12 +50,13 @@ export const ContextProvider = ({ children }) => {
     CO_5: 15,
     CO_6: 15
   });
-
+  const [flagForMainTable,setFlagForMainTable]=useState(false);
   const [showbtn, setShowbtn] = useState(false);
+  const [showTable, setShowTable] = useState(false);
   const createTable = async (tableName) => {
     console.log("context");
     try {
-      setShowbtn(true);
+      // setShowbtn(true);
       console.log("valuetest1", valuefortest1);
       console.log("valueacadamicyear", valueforacadamicyearlabel);
       const response = await axios.get(
@@ -90,6 +92,7 @@ export const ContextProvider = ({ children }) => {
 
             setData(updatedData);
             console.log(updatedData)
+
             // console.log(data)
           }
         }
@@ -103,6 +106,94 @@ export const ContextProvider = ({ children }) => {
       // Handle error if needed
     }
   };
+  
+
+  // to select pattern
+  const [valueforpattern, setValueforpattern] = useState("");
+
+  // select Acadmic Year.
+  // const {valueforacadamicyear, setValueForAcadamicYear} = UseData();
+
+  //to select year.
+  const [valueforyear, setValueforyear] = useState("");
+
+  // for department
+  const [valuefordepartment, setValuedepartment] = useState("");
+
+  // useState for All divisions initial state is object
+  // const [valuefordivisionArray, setValuefordivisionArray] = useState([]);
+  // this to use usestate for addition for subject selection
+  const [valuefordivision, setValuefordivision] = useState("");
+
+  // to select semester and initialsing it by array
+  // const [valueforsemArray, setValueforsemArray] = useState([]);
+  // this useState for addition to find subject
+  const [valueforsem, setValueforsem] = useState("");
+
+  // useState for Subject contaning initial value as object.
+  // const [valueforsubjectArray, setValueforsubjectArray] = useState([]);
+  // to is actual setValue for subject selection
+  const [valueforsubject, setValueforsubject] = useState();
+
+    // // this hook for test selection like ut 1 ut2
+    const [valuefortest, setValuefortest] = useState();
+    const [tableName, setTableName] = useState();
+    const [next,setNext]=useState(false);
+//   const createTables = async () => {
+       
+//     const tableName = `${valueforpattern?.value}_${valueforacadamicyear?.value}_${valueforyear?.value}_${valuefordepartment?.value}_${valueforsem?.value}_${valueforsubject?.value}`;
+//     if (
+//         valueforpattern &&
+//         valueforacadamicyear&&  
+//         valueforyear &&
+//         valuefordepartment &&
+//         valuefordivision &&
+//         valueforsem &&
+//         valueforsubject &&
+//         valuefortest
+//     ) {
+       
+//         setTableName(tableName);
+//         try {
+            
+//             console.log(tableName);
+//             const response = await axios.get(
+//                 `http://localhost:3000/createTable/${tableName}/${valueforyearlabel}/${valuefordepartmentlabel}/${valuefordivisionlabel}
+//             `);
+//             setShowbtn(true);
+//             setNext(false);
+//             if (response.data.length === 0) {
+                
+//                 // Display toast notification for empty table
+//                 toast.warn("Table is empty. Upload to the database.");
+//             } else if (response.status === 200) {
+//                 console.log(response.data);
+//                 if (response.data === "Table created successfully.") {
+                    
+//                     // Table created successfully, show success notification
+//                     toast.success("Table Created Successfully. Enter Data.");
+//                     // await createTable(tableName);
+//                 } else {
+//                     setData(response.data)
+//                     setShowTable(true);
+//                     await createTable(tableName);
+//                 }
+//             } else {
+//                 // Unexpected response, handle it
+//                 console.error("Unexpected response:", response);
+//                 // Handle unexpected response if needed
+//             }
+//         } catch (error) {
+//             console.error("Error creating table:", error);
+//             // Handle error if needed
+//         }
+//     } else {
+//         // Display toast notification for missing fields
+//         toast.error("Please select all fields");
+//         }
+
+//     console.log("this is inside create");
+//     };
 
 
   return (
@@ -128,6 +219,20 @@ export const ContextProvider = ({ children }) => {
       loggedInUserName, setLoggedInUserName,
       valueForRole, setValueForRole,
       createTable,
+      valueforacadamicyear, setValueForAcadamicYear,
+      flagForMainTable,setFlagForMainTable,
+      showTable, setShowTable,
+      showbtn, setShowbtn,
+      valueforpattern, setValueforpattern,
+      valueforyear, setValueforyear,
+      valuefordepartment, setValuedepartment,
+      valuefordivision, setValuefordivision,
+      valueforsem, setValueforsem,
+      valueforsubject, setValueforsubject,
+      valuefortest, setValuefortest,
+      tableName, setTableName,
+      // createTables,
+      next,setNext,
     }}>
       {children}
     </Context.Provider>

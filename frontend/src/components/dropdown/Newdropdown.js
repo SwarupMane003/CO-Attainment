@@ -12,34 +12,34 @@ function Dropdown(teachers_table) {
   const { email } = UseData();
 
   // to select pattern
-  const [valueforpattern, setValueforpattern] = useState("");
+  const {valueforpattern, setValueforpattern} = UseData();
 
   // select Acadmic Year.
-  const [valueforacadamicyear, setValueForAcadamicYear] = useState("");
+  const {valueforacadamicyear, setValueForAcadamicYear} = UseData();
 
   //to select year.
-  const [valueforyear, setValueforyear] = useState("");
+  const {valueforyear, setValueforyear}= UseData();
 
   // for department
-  const [valuefordepartment, setValuedepartment] = useState("");
+  const {valuefordepartment, setValuedepartment} = UseData();
 
   // useState for All divisions initial state is object
   // const [valuefordivisionArray, setValuefordivisionArray] = useState([]);
   // this to use usestate for addition for subject selection
-  const [valuefordivision, setValuefordivision] = useState("");
+  const {valuefordivision, setValuefordivision} = UseData();
 
   // to select semester and initialsing it by array
   const [valueforsemArray, setValueforsemArray] = useState([]);
   // this useState for addition to find subject
-  const [valueforsem, setValueforsem] = useState("");
+  const {valueforsem, setValueforsem} = UseData();
 
   // useState for Subject contaning initial value as object.
   // const [valueforsubjectArray, setValueforsubjectArray] = useState([]);
   // to is actual setValue for subject selection
-  const [valueforsubject, setValueforsubject] = useState();
+  const {valueforsubject, setValueforsubject} = UseData();
 
     // // this hook for test selection like ut 1 ut2
-    const [valuefortest, setValuefortest] = useState();
+    const {valuefortest, setValuefortest} = UseData();
     const { valuefortest1, setValuefortest1 } = UseData();
     const { valueforacadamicyearlabel, setValueForAcademicYearlabel } = UseData();
     const { valuefordepartmentlabel, setvaluefordepartmentlabel } = UseData();
@@ -50,13 +50,14 @@ function Dropdown(teachers_table) {
     const {data, setData} = UseData();
     const {createTable}=UseData();
 
-  const [showbtn, setShowbtn] = useState(false);
+  const {showbtn, setShowbtn} = UseData();
+  const {showTable, setShowTable}= UseData();
   const [tableName, setTableName] = useState();
-  const [showTable, setShowTable] = useState(false);
-  const [subjects, setSubjects] = useState([]);
-  const [divisions, setDivisions] = useState([]);
-  const [transformedSubjects, setTransformedSubjects] = useState([]);
-  const [transformedDivisions, setTransformedDivisions] = useState([]);
+  const {next,setNext}=UseData();
+  // const [subjects, setSubjects] = useState([]);
+  // const [divisions, setDivisions] = useState([]);
+  // const [transformedSubjects, setTransformedSubjects] = useState([]);
+  // const [transformedDivisions, setTransformedDivisions] = useState([]);
 
     let patternnames =[];
     const [transformedPattern,setTransformedPattern]=useState([]);
@@ -230,15 +231,16 @@ function Dropdown(teachers_table) {
         valueforsubject &&
         valuefortest
     ) {
-        setShowbtn(true);
+       
         setTableName(tableName);
         try {
-            setShowbtn(true);
+            
             console.log(tableName);
             const response = await axios.get(
                 `http://localhost:3000/createTable/${tableName}/${valueforyearlabel}/${valuefordepartmentlabel}/${valuefordivisionlabel}
             `);
-           
+            setShowbtn(true);
+            setNext(true);
             if (response.data.length === 0) {
                 
                 // Display toast notification for empty table
@@ -246,12 +248,12 @@ function Dropdown(teachers_table) {
             } else if (response.status === 200) {
                 console.log(response.data);
                 if (response.data === "Table created successfully.") {
-                    console.log("creattt2");
+                    
                     // Table created successfully, show success notification
                     toast.success("Table Created Successfully. Enter Data.");
                     // await createTable(tableName);
                 } else {
-                    console.log("creattt1");
+                    setData(response.data)
                     setShowTable(true);
                     await createTable(tableName);
                 }
@@ -268,6 +270,8 @@ function Dropdown(teachers_table) {
         // Display toast notification for missing fields
         toast.error("Please select all fields");
         }
+
+    console.log("this is inside create");
     };
 
 
@@ -426,6 +430,7 @@ function Dropdown(teachers_table) {
                             setValuedepartment(null);
                             setValueforyear(null);
                             setValueForAcadamicYear(null);
+                            
                         }}
                         isSearchable
                         placeholder="Select Pattern"
@@ -554,7 +559,9 @@ function Dropdown(teachers_table) {
                             checkDivision(selectedOption);
                             setValuefordivisionlabel(selectedOption.label);
                             // setValuefordivision(selectedOption);
-                            
+                            setShowbtn(false);
+                            setShowTable(false);
+                            setNext(true);
                         }}
 
                         isSearchable
@@ -563,13 +570,12 @@ function Dropdown(teachers_table) {
                     >
                     </Select>
                 </div>
-            </div>
+            </div>  
             <div className="create-table">
-                <Button onClick={createTables}>Show Records</Button>
+              {setNext&&  <Button onClick={createTables}>Record</Button>}
             </div>
             <ToastContainer />
-            {showbtn    && (<ParentComponent tableName={tableName} />)}
-            {showTable  && (<Main_table tableName={tableName} />)     }
+            <ParentComponent tableName={tableName} />
         </>
     );
 }
