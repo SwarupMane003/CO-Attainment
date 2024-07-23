@@ -116,6 +116,18 @@ const EditSubject = () => {
     }, []);
 
     const tableName = `${valueforpattern?.value}_${valueforyear?.value}_${valuefordepartment?.value}_${valueforsem?.value}`;
+    const handleSubmit = () => {
+        if (
+            valueforpattern &&
+            valueforyear &&
+            valuefordepartment &&
+            valueforsem
+        ) {
+            handleFetch();
+        } else {
+            toast.error("Please select all fields!");
+        }
+    }
 
     const handleFetch = async () => {
         if (
@@ -136,8 +148,6 @@ const EditSubject = () => {
                 console.error('Error:', error);
                 toast.error("An error occurred while fetching data.");
             }
-        } else {
-            toast.error("Please select all fields!");
         }
     }
 
@@ -296,7 +306,7 @@ const EditSubject = () => {
 
                     <div>
                         <button
-                            onClick={handleFetch}
+                            onClick={handleSubmit}
                             style={buttonStyle}
                         >
                             Fetch

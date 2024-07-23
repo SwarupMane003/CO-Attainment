@@ -13,10 +13,11 @@ const {
   updateTeacherSubjects,
   fetchTeacherData,
   getSubjectsAndDivisions,
+  updateTeacherData,
 } = require("../controllers/teacherController");
 
 router.get("/create_LinkTable/:tableName", createAndLinkTable);
-router.get("/teacherData/:tableName",fetchTeacherData);
+router.get("/teacherData/:tableName", fetchTeacherData);
 router.post("/upload_teachers/:tableName", uploadExcelTeachers);
 router.post("/upload_main_table", uploadMainTable);
 // router.post("/login",login);
@@ -24,6 +25,7 @@ router.post("/forgot_password", forgotPassword);
 router.post("/verify_otp", verifyOTP);
 router.post("/resend_otp", resendOTP);
 router.post("/reset_password", resetPassword);
-router.post("/teachers/update_teacher_subjects/:tableName",updateTeacherSubjects);
-router.get("/getSubjectsAndDivisions/:email/:dataTableName",getSubjectsAndDivisions)
+router.post("/teachers/update_teacher_subjects/:tableName", updateTeacherSubjects);
+router.post("/update_teacher_data/:tableName", updateTeacherData)
+router.get("/getSubjectsAndDivisions/:email/:dataTableName", getSubjectsAndDivisions)
 module.exports = router;

@@ -10,14 +10,14 @@ require("dotenv").config();
 const app = express();
 const crypto = require('crypto');
 const secretKey = crypto.randomBytes(32).toString('hex');
-const{setUserId}=require("../service/auth");
+const { setUserId } = require("../service/auth");
 const jwt = require("jsonwebtoken");
 
-const {setUser}=require("../service/auth");
+const { setUser } = require("../service/auth");
 
 app.use(bodyParser.json());
 const TOKEN_EXPIRATION = '1h';
-const fetchTeacherData=async(req,res)=>{
+const fetchTeacherData = async (req, res) => {
   const { tableName } = req.params;
   console.log(tableName);
 
@@ -62,11 +62,11 @@ const fetchTeacherData=async(req,res)=>{
         )
       `;
       await teachersPool.query(createTableQuery);
-        }
-    } catch (error) {
-      console.error("Error creating, fetching, or linking table:", error);
-      return res.status(500).send('Internal Server Error');
     }
+  } catch (error) {
+    console.error("Error creating, fetching, or linking table:", error);
+    return res.status(500).send('Internal Server Error');
+  }
 }
 const createAndLinkTable = async (req, res) => {
   const { tableName } = req.params;
@@ -241,26 +241,26 @@ async function excelToMySQLArrayTeachers(filePath, tableName) {
     } else {
       console.log("No data to insert.");
     }
-    } catch (error) {
-      console.error("Error:", error);
-      return { error: "An error occurred while processing the Excel file." };
-    }
+  } catch (error) {
+    console.error("Error:", error);
+    return { error: "An error occurred while processing the Excel file." };
   }
+}
 
-  const login = async (req, res) => {
-    const { email, password } = req.body;
+const login = async (req, res) => {
+  const { email, password } = req.body;
 
-    try {
-      const sql = 'SELECT EXISTS (SELECT 1 FROM teacherdata WHERE `Email ID` = ? AND Password = ?) AS user_exists';
-      const result = await teachersPool.query(sql, [email, password]);
-      const sql2 = 'SELECT name FROM teacherdata WHERE `Email ID` = ? AND Password = ?';
-      const result2 = await teachersPool.query(sql2, [email, password]);
-      const sql3 = 'SELECT * FROM teacherdata WHERE `Email ID` = ? AND Password = ?';
-      const user1 = await teachersPool.query(sql3, [email, password]);
+  try {
+    const sql = 'SELECT EXISTS (SELECT 1 FROM teacherdata WHERE `Email ID` = ? AND Password = ?) AS user_exists';
+    const result = await teachersPool.query(sql, [email, password]);
+    const sql2 = 'SELECT name FROM teacherdata WHERE `Email ID` = ? AND Password = ?';
+    const result2 = await teachersPool.query(sql2, [email, password]);
+    const sql3 = 'SELECT * FROM teacherdata WHERE `Email ID` = ? AND Password = ?';
+    const user1 = await teachersPool.query(sql3, [email, password]);
 
-      if (result[0][0]['user_exists'] == 1) {
-      const user=user1[0][0];
-      res.status(200).json({ email:user['Email ID'],department:user.Department,role:user.Role, name: user.name });
+    if (result[0][0]['user_exists'] == 1) {
+      const user = user1[0][0];
+      res.status(200).json({ email: user['Email ID'], department: user.Department, role: user.Role, name: user.name });
     }
     else if (result[0][0]['user_exists'] == 0) {
       return res.status(401).send("Invalid Credentials!");
@@ -616,7 +616,7 @@ const updateTeacherSubjects = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-const updateTeacherData=async(req,res)=>{
+const updateTeacherData = async (req, res) => {
   try {
     const tableName = req.params.tableName;
     const data = req.body;
@@ -684,13 +684,13 @@ const getSubjectsAndDivisions = async (req, res) => {
 }
 
 
-const getSubjectAsPerAllotmaint=async(req,res)=>{
-  try{
-      const{subjectTableName,email}=req.params;
-      const query=`slect Subject from ${subjectTableName} where \`Email ID\`==${email}`;
-      const result=await teachersPool.query(query);
-  }catch(error){
-    res.send({message:"Internal server error"});
+const getSubjectAsPerAllotmaint = async (req, res) => {
+  try {
+    const { subjectTableName, email } = req.params;
+    const query = `slect Subject from ${subjectTableName} where \`Email ID\`==${email}`;
+    const result = await teachersPool.query(query);
+  } catch (error) {
+    res.send({ message: "Internal server error" });
   }
 }
 
@@ -701,4 +701,4 @@ const getSubjectAsPerAllotmaint=async(req,res)=>{
 //-------------------------------------------------------------------------------------
 
 
-module.exports = { updateTeacherSubjects,createAndLinkTable, uploadExcelTeachers, uploadMainTable, login, forgotPassword, verifyOTP, resendOTP, resetPassword, getSubjectsAndDivisions,fetchTeacherData};
+module.exports = { updateTeacherData, updateTeacherSubjects, createAndLinkTable, uploadExcelTeachers, uploadMainTable, login, forgotPassword, verifyOTP, resendOTP, resetPassword, getSubjectsAndDivisions, fetchTeacherData };

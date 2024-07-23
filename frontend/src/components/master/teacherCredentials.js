@@ -150,7 +150,7 @@ const TeacherCredentials = () => {
   };
   const handleSaveData = async () => {
     try {
-      console.log("into ");
+      console.log(data);
       const response = await axios.post(
         `http://localhost:3000/teachers/update_teacher_data/${tableName}`,
         data
@@ -170,17 +170,17 @@ const TeacherCredentials = () => {
   };
   return (
     <>
-      <h1 style={{ textAlign: "center" ,marginTop:'10px'}}>Insert Teacher's Data</h1>
-      <Button 
-  onClick={downloadSampleFile} 
-  style={{ 
-    margin: "1% 0 0 43%", 
-    backgroundColor: "#4caf50", 
-    color: "white" 
-  }}
->
-  Download Sample File
-</Button>
+      <h1 style={{ textAlign: "center", marginTop: '10px' }}>Insert Teacher's Data</h1>
+      <Button
+        onClick={downloadSampleFile}
+        style={{
+          margin: "1% 0 0 43%",
+          backgroundColor: "#4caf50",
+          color: "white"
+        }}
+      >
+        Download Sample File
+      </Button>
 
       <div className="accept-and-save">
         <input
@@ -190,13 +190,13 @@ const TeacherCredentials = () => {
           accept=".xlsx"
         />
         <div className="omkar">
-          <Button variant="primary" onClick={handleSave} disabled={uploading}style={{ 
-     
-    backgroundColor: "#4caf50", 
-    color: "white" 
-  }}>
+          <Button variant="primary" onClick={handleSave} disabled={uploading} style={{
+
+            backgroundColor: "#4caf50",
+            color: "white"
+          }}>
             {uploading ? "Uploading..." : "Upload Excel"}
-            
+
           </Button>
         </div>
       </div>
@@ -217,7 +217,7 @@ const TeacherCredentials = () => {
         </thead>
         <tbody>
           {data.map((row, index) => (
-            <tr key={index}>
+            <tr key={index} >
               <td style={{ padding: "8px" }}>{index + 1}</td>
               <td className="name-col" style={{ padding: "8px" }}>
                 <input
@@ -228,7 +228,7 @@ const TeacherCredentials = () => {
               </td>
               <td style={{ padding: "8px" }}>
                 <input
-                  type="text"
+                  type="password"
                   value={row["Password"]}
                   onChange={(e) => handleInputChange(e, index, "Password")}
                 />
@@ -269,11 +269,11 @@ const TeacherCredentials = () => {
         <tfoot>
           <tr>
             <td colSpan="6" style={{ padding: "8px" }}>
-              <Button onClick={handleAddRow} style={{ 
-    
-    backgroundColor: "#4caf50", 
-    color: "white" 
-  }}>
+              <Button onClick={handleAddRow} style={{
+
+                backgroundColor: "#4caf50",
+                color: "white"
+              }}>
                 Add Row</Button>
             </td>
           </tr>
@@ -287,8 +287,8 @@ const TeacherCredentials = () => {
           textAlign: "center",
           alignItems: "center",
           marginLeft: "40%",
-          backgroundColor:"#4caf50",
-          marginBottom:'10px'
+          backgroundColor: "#4caf50",
+          marginBottom: '10px'
         }}
       >
         Save Data
