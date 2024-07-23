@@ -54,6 +54,8 @@ function Dropdown(teachers_table) {
   const {showTable, setShowTable}= UseData();
   const [tableName, setTableName] = useState();
   const {next,setNext}=UseData();
+  const {targetButtonFlag, setTargetButtonFlag} = UseData();
+
   // const [subjects, setSubjects] = useState([]);
   // const [divisions, setDivisions] = useState([]);
   // const [transformedSubjects, setTransformedSubjects] = useState([]);
@@ -562,6 +564,7 @@ function Dropdown(teachers_table) {
                             setShowbtn(false);
                             setShowTable(false);
                             setNext(true);
+                            setTargetButtonFlag(false);
                         }}
 
                         isSearchable

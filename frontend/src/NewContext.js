@@ -50,6 +50,7 @@ export const ContextProvider = ({ children }) => {
     CO_5: 15,
     CO_6: 15
   });
+  const [targetButtonFlag, setTargetButtonFlag] = useState(false);
   const [flagForMainTable,setFlagForMainTable]=useState(false);
   const [showbtn, setShowbtn] = useState(false);
   const [showTable, setShowTable] = useState(false);
@@ -233,6 +234,7 @@ export const ContextProvider = ({ children }) => {
       tableName, setTableName,
       // createTables,
       next,setNext,
+      targetButtonFlag, setTargetButtonFlag,
     }}>
       {children}
     </Context.Provider>

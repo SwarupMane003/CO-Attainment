@@ -4,10 +4,11 @@ import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { f } from "html2pdf.js";
-
+import { UseData } from "../NewContext";
 function MaxMarkTable({ tableName }) {
     // 
     const [data, setData] = useState();
+    const {targetButtonFlag, setTargetButtonFlag} = UseData();
 
 
     // to store maximunm marks of each co;
@@ -88,8 +89,9 @@ function MaxMarkTable({ tableName }) {
         }
     };
     return (
-        <>
-            <Button style={{marginLeft: '47%',marginBottom: '10px'}} onClick={handelOnclick} >{data ? "Hide Marks" : "Enter Marks"}</Button>
+        <div>{targetButtonFlag && 
+        (<>
+            <Button style={{marginLeft: '47%',marginBottom: '10px'}} onClick={handelOnclick} >{data ? "Marks" : "Check Max Marks per Question"}</Button>
             {data && <div className="level-container col-md-9">
                 <form >
                     <Table>
@@ -115,10 +117,11 @@ function MaxMarkTable({ tableName }) {
                         </tbody>
                     </Table>
                     {/* <Button className="bg-primary" type="submit">Save</Button> */}
-                    <Button style={{marginLeft: '48%',marginBottom: '10px'}} className="bg-primary" onClick={updateMarks}>Edit</Button>
+                    <Button style={{marginLeft: '48%',marginBottom: '10px'}} className="bg-primary" onClick={updateMarks}>Save</Button>
                 </form>
             </div>}
-        </>
+        </>)
+            }</div>
     )
 }
 export default MaxMarkTable;
